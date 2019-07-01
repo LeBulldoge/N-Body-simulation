@@ -2,7 +2,7 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aColor;
 
-float scale = 0.000000005f;
+float scale = 0.0000000000003f;
 
 out vec3 ourColor;
 

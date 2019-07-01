@@ -46,10 +46,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\VertShader.glsl">
+    <None Include="Shaders\VertShader.vert">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\FragShader.glsl">
+    <None Include="Shaders\FragShader.frag">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

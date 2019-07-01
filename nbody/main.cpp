@@ -172,7 +172,7 @@ int main(void)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	GLFWwindow* window;
-	window = glfwCreateWindow(WIDTH, HEIGHT, "N-body", NULL, NULL);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "N-Body simulation", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
@@ -190,16 +190,11 @@ int main(void)
 		return -1;
 	}
 
-	bodies = randBodies(POINTS);
-
-	Body sun = Body(glm::vec3(0, 0, 0),
-		glm::normalize(glm::vec3(253, 166, 0)),
-		glm::vec3(0, 0, 0),
-		1.98892e31);
+	//bodies = randBodies(POINTS);
 
 	Shader shader;
-	shader.source(GL_VERTEX_SHADER, "Shaders/VertShader.glsl");
-	shader.source(GL_FRAGMENT_SHADER, "Shaders/FragShader.glsl");
+	shader.source(GL_VERTEX_SHADER, "Shaders/VertShader.vert");
+	shader.source(GL_FRAGMENT_SHADER, "Shaders/FragShader.frag");
 	shader.link();
 
 	unsigned int VBO;
@@ -221,14 +216,11 @@ int main(void)
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, WIDTH, HEIGHT, 0, -100, 100);
+	glOrtho(0, WIDTH, HEIGHT, 0, -10000, 10000);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glPointSize(5);
+	glPointSize(3);
 
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
@@ -239,8 +231,7 @@ int main(void)
 		double currentTime = glfwGetTime();
 		nbFrames++;
 		if (currentTime - lastTime >= 1.0)
-		{ // If last prinf() was more than 1 sec ago
-// printf and reset timer
+		{
 			printf("%f ms/frame\n", 1000.0 / double(nbFrames));
 			nbFrames = 0;
 			lastTime += 1.0;

@@ -40,12 +40,13 @@ void Body::update()
 void Body::addG(Body& b)
 {
 	//Distance vector
-	glm::vec3 dist;
-	dist = b.pos - pos;
+	glm::vec3 dist = b.pos - pos;
 	//Normalized distance
-	float nDist = glm::distance(pos, b.pos) + 0.25;
+	float r2 = glm::dot(dist, dist);
+	float r3 = r2 * glm::sqrt(r2 + 0.25f * 0.25f);
+	//float nDist = glm::distance(pos, b.pos);
 	//Calculating force
-	float F = ((b.mass * G) / (nDist * nDist * nDist));
+	float F = ((b.mass * G) / (r3 + 0.01f));
 	//Acceleration
 	acc += F * dist;
 }
