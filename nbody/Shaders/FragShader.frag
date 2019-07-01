@@ -1,8 +1,9 @@
 #version 330 core
-out vec4 FragColor;
-in vec3 ourColor;
+
+out vec4 gl_FragColor;
+in vec3 outColor;
 
 void main()
 {
-	FragColor = vec4(ourColor, 1.0);
+	gl_FragColor = vec4(outColor, 1.0);
 }
