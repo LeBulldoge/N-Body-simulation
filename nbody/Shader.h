@@ -4,9 +4,8 @@
 
 class Shader {
 
-	GLuint id;
-
 public:
+	GLuint id;
 	
 	Shader();
 

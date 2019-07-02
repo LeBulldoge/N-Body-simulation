@@ -18,7 +18,7 @@ std::uniform_real_distribution<> dis(0, 1);
 glm::vec3 randomPos()
 {
 	glm::vec3 pos;
-	float t = dis(rng) * 2 * PI;
+	float t = dis(rng) * 2.f * PI;
 	float s = dis(rng);
 	pos.x = cos(t)*s;
 	pos.y = sin(t)*s;
@@ -82,11 +82,6 @@ int main(void)
 			for (auto& body : bodies)
 			{
 				body.resetG();
-				if (glm::distance(body.pos, glm::vec3(0, 0, 0)) > 10)
-				{
-					body.pos = randomPos();
-					body.vel = randomVel(body.pos) / 100000.f;
-				}
 				for (auto& other : bodies)
 				{
 					if (body != other)

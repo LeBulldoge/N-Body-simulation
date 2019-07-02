@@ -8,13 +8,13 @@
 
 class Body {
 
-public:
-	//Body();
 	glm::vec3 pos;
 	glm::vec3 color;
 	glm::vec3 vel;
 	glm::vec3 acc;
 	const double mass;
+
+public:
 	Body(glm::vec3 p,
 		glm::vec3 c,
 		glm::vec3 v,
