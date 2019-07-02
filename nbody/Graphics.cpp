@@ -60,7 +60,7 @@ int initGLFW()
 
 	glfwMakeContextCurrent(window);
 
-	return 1;
+	return 0;
 }
 
 int initGLEW()
@@ -71,7 +71,7 @@ int initGLEW()
 		return -1;
 	}
 
-	return 1;
+	return 0;
 }
 
 void initGFX()
@@ -84,7 +84,7 @@ void initGFX()
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, BODIES * sizeof(Body), NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -113,10 +113,10 @@ void drawBodies(GLfloat* bods)
 	glUseProgram(program);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, BODIES * sizeof(Body), NULL, GL_STREAM_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, BODIES * sizeof(Body), bods);
+	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, AMOUNT * sizeof(Body), bods);
 
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_POINTS, 0, BODIES);
+	glDrawArrays(GL_POINTS, 0, AMOUNT);
 	glBindVertexArray(0);
 }

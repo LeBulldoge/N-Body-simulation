@@ -32,19 +32,12 @@ glm::vec3 randomVel(glm::vec3 pos)
 	// Initial velocity is 'orbital' velocity from position
 	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(0, 0, 1));
 	float orbital_vel = sqrt(2 * glm::length(vel));
-	vel = glm::normalize(vel)*orbital_vel;
+	vel = glm::normalize(vel)*orbital_vel / 100000.f;
 	return vel;
 }
 
-std::vector<Body> randBodies(const int size)
+void randBodies(const int size, std::vector<Body>& bods)
 {
-	std::vector<Body> bods;
-	//bods.push_back(
-	//	Body(glm::vec3(0, 0, 0),
-	//		glm::vec3(dis(rng), dis(rng), dis(rng)),
-	//		glm::vec3(0, 0, 0),
-	//		1e60
-	//	));
 	for (int i = 0; i < size; i++)
 	{
 		glm::vec3 pos = randomPos();
@@ -52,12 +45,11 @@ std::vector<Body> randBodies(const int size)
 		bods.push_back(
 			Body(pos,
 				glm::vec3(dis(rng), dis(rng), dis(rng)),
-				vel / 100000.f,
+				vel,
 				dis(rng)
 			)
 		);
 	}
-	return bods;
 }
 
 int main(void)
@@ -70,7 +62,8 @@ int main(void)
 	initGLEW();
 	initGFX();
 
-	std::vector<Body> bodies = randBodies(BODIES);
+	std::vector<Body> bodies;
+	randBodies(AMOUNT, bodies);
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -110,9 +103,8 @@ int main(void)
 
 			drawBodies((GLfloat*)&bodies[0]);
 
+			glfwSwapBuffers(window);
 		}
-
-		glfwSwapBuffers(window);
 
 		glfwPollEvents();
 	}
