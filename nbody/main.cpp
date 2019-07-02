@@ -54,7 +54,6 @@ void randBodies(const int size, std::vector<Body>& bods)
 
 int main(void)
 {
-
 	double lastTime = glfwGetTime();
 	int nbFrames = 0;
 
@@ -105,5 +104,7 @@ int main(void)
 	}
 
 	glfwTerminate();
+
 	return 0;
+
 }
