@@ -124,6 +124,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Body.cpp" />
+    <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OctTree.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -131,6 +132,7 @@
   <ItemGroup>
     <ClInclude Include="Body.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="Graphics.h" />
     <ClInclude Include="OctTree.h" />
     <ClInclude Include="Shader.h" />
   </ItemGroup>
