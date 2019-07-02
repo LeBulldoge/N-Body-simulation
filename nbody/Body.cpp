@@ -4,9 +4,9 @@ Body::Body(glm::vec3 p,
 	glm::vec3 c,
 	glm::vec3 v,
 	const double mass)
-	: pos(p*1000.f)
+	: pos(p)
 	, color(c)
-	, vel(v*1000.f)
+	, vel(v)
 	, acc(0, 0, 0)
 	, mass(mass)
 {
@@ -31,10 +31,23 @@ glm::vec3 Body::Pos()
 
 void Body::update()
 {
+	float oldDist = glm::distance(glm::vec3(0, 0, 0), pos);
+
 	//Velocity
 	vel += acc * step;
 	//Position
 	pos += vel * step;
+
+	float newDist = glm::distance(glm::vec3(0, 0, 0), pos);
+	
+	if (oldDist > newDist)
+	{
+		color += 0.005f;
+	}
+	else
+	{
+		color -= 0.005f;
+	}
 }
 
 void Body::addG(Body& b)
@@ -44,7 +57,6 @@ void Body::addG(Body& b)
 	//Normalized distance
 	float r2 = glm::dot(dist, dist);
 	float r3 = r2 * glm::sqrt(r2 + 0.25f * 0.25f);
-	//float nDist = glm::distance(pos, b.pos);
 	//Calculating force
 	float F = ((b.mass * G) / (r3 + 0.01f));
 	//Acceleration

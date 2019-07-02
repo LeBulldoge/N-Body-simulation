@@ -18,26 +18,24 @@ std::vector<Body> bodies;
 std::random_device seed;
 std::mt19937 rng(seed());
 std::uniform_real_distribution<> dis(0, 1);
-std::uniform_real_distribution<> disMass(1, 2e30);
 
-glm::vec3 randomParticlePos()
+glm::vec3 randomPos()
 {
-	// Random position on a 'thick disk'
-	glm::vec3 particle;
-	float t = dis(rng) * 2.f * PI;
-	float s = dis(rng) * 100000.f;
-	particle.x = cos(t)*s;
-	particle.y = sin(t)*s;
-	particle.z = dis(rng) * 4;
+	glm::vec3 pos;
+	float t = dis(rng) * 2 * PI;
+	float s = dis(rng);
+	pos.x = cos(t)*s;
+	pos.y = sin(t)*s;
+	pos.z = dis(rng);
 
-	return particle;
+	return pos;
 }
 
-glm::vec3 randomParticleVel(glm::vec3 pos)
+glm::vec3 randomVel(glm::vec3 pos)
 {
 	// Initial velocity is 'orbital' velocity from position
 	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(0, 0, 1));
-	float orbital_vel = sqrt(2.0*glm::length(vel));
+	float orbital_vel = sqrt(2 * glm::length(vel));
 	vel = glm::normalize(vel)*orbital_vel;
 	return vel;
 }
@@ -45,21 +43,21 @@ glm::vec3 randomParticleVel(glm::vec3 pos)
 std::vector<Body> randBodies(const int size)
 {
 	std::vector<Body> bods;
-	bods.push_back(
-		Body(glm::vec3(0, 0, 0),
-			glm::vec3(dis(rng), dis(rng), dis(rng)),
-			glm::vec3(0, 0, 0),
-			2e31
-		));
-	for (int i = 0; i < size-1; i++)
+	//bods.push_back(
+	//	Body(glm::vec3(0, 0, 0),
+	//		glm::vec3(dis(rng), dis(rng), dis(rng)),
+	//		glm::vec3(0, 0, 0),
+	//		1e60
+	//	));
+	for (int i = 0; i < size; i++)
 	{
-		glm::vec3 pos = randomParticlePos();
-		glm::vec3 vel = randomParticleVel(pos);
+		glm::vec3 pos = randomPos();
+		glm::vec3 vel = randomVel(pos);
 		bods.push_back(
 			Body(pos,
 				glm::vec3(dis(rng), dis(rng), dis(rng)),
-				vel,
-				disMass(rng)
+				vel / 100000.f,
+				dis(rng)
 			)
 		);
 	}
@@ -151,7 +149,7 @@ int main(void)
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
 	glEnableVertexAttribArray(1);
@@ -160,7 +158,7 @@ int main(void)
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, WIDTH, HEIGHT, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	glPointSize(3);
@@ -185,6 +183,11 @@ int main(void)
 			for (auto& body : bodies)
 			{
 				body.resetG();
+				if (glm::distance(body.pos, glm::vec3(0, 0, 0)) > 10)
+				{
+					body.pos = randomPos();
+					body.vel = randomVel(body.pos) / 100000.f;
+				}
 				for (auto& other : bodies)
 				{
 					if (body != other)
