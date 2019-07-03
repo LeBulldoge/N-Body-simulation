@@ -3,7 +3,6 @@
 #include <vector>
 
 #include <glm.hpp>
-#include <vec3.hpp>
 
 #include "Constants.h"
 #include "Body.h"
@@ -44,7 +43,6 @@ void randBodies(const int size, std::vector<Body>& bods)
 		glm::vec3 vel = randomVel(pos);
 		bods.push_back(
 			Body(pos,
-				glm::vec3(dis(rng), dis(rng), dis(rng)),
 				vel,
 				dis(rng)
 			)

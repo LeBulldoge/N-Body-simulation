@@ -1,11 +1,9 @@
 #include "Body.h"
 
 Body::Body(glm::vec3 p,
-	glm::vec3 c,
 	glm::vec3 v,
-	const double mass)
+	float mass)
 	: pos(p)
-	, color(c)
 	, vel(v)
 	, acc(0, 0, 0)
 	, mass(mass)
@@ -31,23 +29,10 @@ glm::vec3 Body::Pos()
 
 void Body::update()
 {
-	float oldDist = glm::distance(glm::vec3(0, 0, 0), pos);
-
 	//Velocity
 	vel += acc * step;
 	//Position
 	pos += vel * step;
-
-	float newDist = glm::distance(glm::vec3(0, 0, 0), pos);
-	
-	if (oldDist > newDist)
-	{
-		color += 0.005f;
-	}
-	else
-	{
-		color -= 0.005f;
-	}
 }
 
 void Body::addG(Body& b)

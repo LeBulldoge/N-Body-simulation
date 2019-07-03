@@ -2,23 +2,20 @@
 #include <string>
 
 #include <glm.hpp>
-#include <vec3.hpp>
 
 #include "Constants.h"
 
 class Body {
 
 	glm::vec3 pos;
-	glm::vec3 color;
+	float mass;
 	glm::vec3 vel;
 	glm::vec3 acc;
-	const double mass;
 
 public:
 	Body(glm::vec3 p,
-		glm::vec3 c,
 		glm::vec3 v,
-		const double mass);
+		float mass);
 	//~Body();
 	double Mass();
 	glm::vec3 Vel();

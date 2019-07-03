@@ -2,6 +2,9 @@
 
 GLuint VBO;
 GLuint VAO;
+GLuint VBOcube;
+GLuint VAOcube;
+
 GLuint program;
 GLFWwindow* window;
 
@@ -82,41 +85,62 @@ void initGFX()
 	shader.link();
 	program = shader.ID();
 
+	float vertices[] = { -1,-1, -1,1, 1,1, 1,1, 1,-1, -1,-1 };
+
+	glGenBuffers(1, &VBOcube);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOcube);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &VAOcube);
+	glBindVertexArray(VAOcube);
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
+	glEnableVertexAttribArray(0);
+
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
-	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+	glVertexAttribDivisor(0, 1);
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
+	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
+	glVertexAttribDivisor(1, 1);
 	glEnableVertexAttribArray(1);
 
 	glViewport(0, 0, WIDTH, HEIGHT);
-	glMatrixMode(GL_PROJECTION);
+	/*glm::mat4 proj(1.f);
+	proj = glm::ortho(0, WIDTH, HEIGHT, 0, 0, 100);
+	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_TRUE, glm::value_ptr(proj));
+	glMatrixMode(GL_PROJECTION);*/
 	glLoadIdentity();
 	glOrtho(0, WIDTH, HEIGHT, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-
-	glPointSize(2);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void drawBodies(GLfloat* bods)
 {
 	glClearColor(0.01f, 0.10f, 0.15f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
 
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, AMOUNT * sizeof(Body), bods);
 
+	/*glm::mat4 view = glm::mat4(1.0f);
+	view = glm::lookAt(glm::vec3(0.f, 0.f, 10.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
+
+	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));*/
+
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_POINTS, 0, AMOUNT);
+	glDrawArraysInstanced(GL_POINTS, 0, 1, AMOUNT);
 	glBindVertexArray(0);
 }
