@@ -4,6 +4,8 @@ GLuint VBO;
 GLuint VAO;
 GLuint VBOcube;
 GLuint VAOcube;
+GLuint texture;
+GLuint sampler;
 
 GLuint program;
 GLFWwindow* window;
@@ -77,6 +79,68 @@ int initGLEW()
 	return 0;
 }
 
+GLuint loadTexture(const char* imagePath)
+{
+	// Data read from the header of the BMP file
+	unsigned char header[54]; // Each BMP file begins by a 54-bytes header
+	unsigned int dataPos;     // Position in the file where the actual data begins
+	unsigned int width, height;
+	unsigned int imageSize;   // = width*height*3
+	// Actual RGB data
+	unsigned char* data;
+
+	FILE* file;
+	fopen_s(&file, imagePath, "rb");
+	if (!file)
+	{ 
+		printf("File %s couldn't be opened!\n", imagePath); 
+		return -1; 
+	}
+	if (fread(header, 1, 54, file) != 54)
+	{
+		printf("Not a correct BMP file!");
+		return -1;
+	}
+	if (header[0] != 'B' || header[1] != 'M')
+	{
+		printf("Not a correct BMP file!");
+		return -1;
+	}
+
+	dataPos = *(int*)&(header[0x0A]);
+	imageSize = *(int*)&(header[0x22]);
+	width = *(int*)&(header[0x12]);
+	height = *(int*)&(header[0x16]);
+	if (imageSize == 0)
+	{
+		imageSize = width * height * 3;
+	}
+	if (dataPos == 0)
+	{
+		dataPos = 54;
+	}
+
+	data = new unsigned char[imageSize];
+	fread(data, 1, imageSize, file);
+	fclose(file);
+
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+	delete[] data;
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	return textureID;
+}
+
 void initGFX()
 {
 	Shader shader;
@@ -85,7 +149,15 @@ void initGFX()
 	shader.link();
 	program = shader.ID();
 
-	float vertices[] = { -1,-1, -1,1, 1,1, 1,1, 1,-1, -1,-1 };
+	sampler = glGetUniformLocation(program, "bodyTexture");
+
+	float vertices[] = 
+	{ 
+		-0.5f, -0.5f, 0.0f,
+		0.5f, -0.5f, 0.0f,
+		-0.5f,  0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f, 
+	};
 
 	glGenBuffers(1, &VBOcube);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOcube);
@@ -94,8 +166,8 @@ void initGFX()
 	glGenVertexArrays(1, &VAOcube);
 	glBindVertexArray(VAOcube);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, false, 0, 0);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, (void*)0);
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -105,18 +177,21 @@ void initGFX()
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
-	glVertexAttribDivisor(0, 1);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
-	glVertexAttribDivisor(1, 1);
 	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
+
+	glVertexAttribDivisor(0, 0);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribDivisor(2, 1);
+
+	texture = loadTexture("texture.bmp");
 
 	glViewport(0, 0, WIDTH, HEIGHT);
-	/*glm::mat4 proj(1.f);
-	proj = glm::ortho(0, WIDTH, HEIGHT, 0, 0, 100);
-	glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_TRUE, glm::value_ptr(proj));
-	glMatrixMode(GL_PROJECTION);*/
+
+	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	glOrtho(0, WIDTH, HEIGHT, 0, 0, 1);
 	glMatrixMode(GL_MODELVIEW);
@@ -130,17 +205,26 @@ void drawBodies(GLfloat* bods)
 	glClearColor(0.01f, 0.10f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
+	
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOcube);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, (void*)0);
 
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, AMOUNT * sizeof(Body), bods);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
 
-	/*glm::mat4 view = glm::mat4(1.0f);
-	view = glm::lookAt(glm::vec3(0.f, 0.f, 10.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 0.f));
+	glVertexAttribDivisor(0, 0);
+	glVertexAttribDivisor(1, 1);
+	glVertexAttribDivisor(2, 1);
 
-	glUniformMatrix4fv(glGetUniformLocation(program, "view"), 1, GL_FALSE, glm::value_ptr(view));*/
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, AMOUNT);
 
-	glBindVertexArray(VAO);
-	glDrawArraysInstanced(GL_POINTS, 0, 1, AMOUNT);
-	glBindVertexArray(0);
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
 }

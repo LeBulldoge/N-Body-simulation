@@ -1,9 +1,13 @@
 #version 330 core
 
+in vec2 UV;
+
 out vec4 gl_FragColor;
-in float outMass;
+in float Mass;
+
+uniform sampler2D bodyTexture;
 
 void main()
 {
-	gl_FragColor = vec4(outMass, outMass, outMass, 1.0);
+	gl_FragColor = vec4(Mass, Mass, Mass, 1.f);
 }
