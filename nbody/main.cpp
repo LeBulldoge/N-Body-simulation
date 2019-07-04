@@ -13,6 +13,7 @@ extern bool pause = false;
 std::random_device seed;
 std::mt19937 rng(seed());
 std::uniform_real_distribution<> dis(0, 1);
+std::uniform_real_distribution<> disMass(0.1, 1);
 
 glm::vec3 randomPos()
 {
@@ -44,7 +45,7 @@ void randBodies(const int size, std::vector<Body>& bods)
 		bods.push_back(
 			Body(pos,
 				vel,
-				dis(rng)
+				disMass(rng)
 			)
 		);
 	}

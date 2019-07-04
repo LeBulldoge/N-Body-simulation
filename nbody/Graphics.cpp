@@ -79,67 +79,76 @@ int initGLEW()
 	return 0;
 }
 
-GLuint loadTexture(const char* imagePath)
+GLuint loadTextureDDS(const char* imagePath)
 {
-	// Data read from the header of the BMP file
-	unsigned char header[54]; // Each BMP file begins by a 54-bytes header
-	unsigned int dataPos;     // Position in the file where the actual data begins
-	unsigned int width, height;
-	unsigned int imageSize;   // = width*height*3
-	// Actual RGB data
-	unsigned char* data;
+	unsigned char header[124];
 
-	FILE* file;
-	fopen_s(&file, imagePath, "rb");
-	if (!file)
-	{ 
-		printf("File %s couldn't be opened!\n", imagePath); 
-		return -1; 
-	}
-	if (fread(header, 1, 54, file) != 54)
+	FILE *fp;
+
+	//try to open the file
+	fopen_s(&fp, imagePath, "rb");
+	if (fp == NULL)
+		return 0;
+
+	//verify the type of file
+	char filecode[4];
+	fread(filecode, 1, 4, fp);
+	if (strncmp(filecode, "DDS ", 4) != 0)
 	{
-		printf("Not a correct BMP file!");
-		return -1;
-	}
-	if (header[0] != 'B' || header[1] != 'M')
-	{
-		printf("Not a correct BMP file!");
-		return -1;
+		fclose(fp);
+		return 0;
 	}
 
-	dataPos = *(int*)&(header[0x0A]);
-	imageSize = *(int*)&(header[0x22]);
-	width = *(int*)&(header[0x12]);
-	height = *(int*)&(header[0x16]);
-	if (imageSize == 0)
-	{
-		imageSize = width * height * 3;
-	}
-	if (dataPos == 0)
-	{
-		dataPos = 54;
-	}
+	//get the surface desc
+	fread(&header, 124, 1, fp);
 
-	data = new unsigned char[imageSize];
-	fread(data, 1, imageSize, file);
-	fclose(file);
+	unsigned int height = *(unsigned int*)&(header[8]);
+	unsigned int width = *(unsigned int*)&(header[12]);
+	unsigned int linearSize = *(unsigned int*)&(header[16]);
+	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
+	unsigned int fourCC = *(unsigned int*)&(header[80]);
+
+	unsigned char * buffer;
+	unsigned int bufsize;
+	//how big is it going to be including all mipmaps?
+	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
+	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
+	fread(buffer, 1, bufsize, fp);
+	//close the file pointer
+	fclose(fp);
+
+	unsigned int format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 
 	GLuint textureID;
 	glGenTextures(1, &textureID);
+
+	// "Bind" the newly created texture : all future texture functions will modify this texture
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
+	unsigned int offset = 0;
 
-	delete[] data;
+	/* load the mipmaps */
+	for (unsigned int level = 0; level < mipMapCount && (width || height); ++level)
+	{
+		unsigned int size = ((width + 3) / 4)*((height + 3) / 4)*blockSize;
+		glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height,
+			0, size, buffer + offset);
+
+		offset += size;
+		width /= 2;
+		height /= 2;
+	}
+	free(buffer);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glGenerateMipmap(GL_TEXTURE_2D);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
 	return textureID;
 }
+
 
 void initGFX()
 {
@@ -187,17 +196,18 @@ void initGFX()
 	glVertexAttribDivisor(1, 1);
 	glVertexAttribDivisor(2, 1);
 
-	texture = loadTexture("texture.bmp");
+	texture = loadTextureDDS("texture.dds");
 
 	glViewport(0, 0, WIDTH, HEIGHT);
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, WIDTH, HEIGHT, 0, 0, 1);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
+	glOrtho(0, WIDTH, 0, HEIGHT, 0, 1);
+
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_PROGRAM_POINT_SIZE);
+	glDepthFunc(GL_ALWAYS);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void drawBodies(GLfloat* bods)
@@ -205,6 +215,10 @@ void drawBodies(GLfloat* bods)
 	glClearColor(0.01f, 0.10f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE0, texture);
+	glUniform1i(sampler, 0);
 	
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOcube);
