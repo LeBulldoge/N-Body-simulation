@@ -10,6 +10,11 @@ Body::Body(glm::vec3 p,
 {
 }
 
+Body::~Body()
+{
+
+}
+
 double Body::Mass()
 {
 	return mass;

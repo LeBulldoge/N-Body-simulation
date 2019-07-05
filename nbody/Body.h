@@ -16,7 +16,7 @@ public:
 	Body(glm::vec3 p,
 		glm::vec3 v,
 		float mass);
-	//~Body();
+	~Body();
 	double Mass();
 	glm::vec3 Vel();
 	glm::vec3 Acc();

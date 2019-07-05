@@ -9,5 +9,8 @@ uniform sampler2D bodyTexture;
 
 void main()
 {
-	gl_FragColor = texture2D(bodyTexture, UV) * vec4(Mass, Mass, Mass, 1.f);
+	vec4 tex = texture2D(bodyTexture, UV);
+	if (tex.a < 0.5)
+		discard;
+	gl_FragColor = tex * vec4(Mass, Mass, Mass, 1.f);
 }

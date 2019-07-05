@@ -102,6 +102,8 @@ int main(void)
 		glfwPollEvents();
 	}
 
+	bodies.~vector();
+
 	glfwTerminate();
 
 	return 0;

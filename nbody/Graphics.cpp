@@ -204,7 +204,7 @@ void initGFX()
 	glOrtho(0, WIDTH, 0, HEIGHT, 0, 1);
 
 	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_ALWAYS);
+	glDepthFunc(GL_LESS);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
