@@ -7,74 +7,55 @@
 #include "Constants.h"
 #include "Body.h"
 #include "Graphics.h"
+#include "WindowManager.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 
 extern bool pause = false;
+static WindowManager wm(5);
+static std::vector<float> frames;
 
-std::random_device seed;
-std::mt19937 rng(seed());
-std::uniform_real_distribution<> dis(0, 1);
-std::uniform_real_distribution<> disMass(0.1, 1);
-
-glm::vec3 randomPos()
+void showFps()
 {
-	glm::vec3 pos;
-	float t = dis(rng) * 2.f * PI;
-	float s = dis(rng);
-	pos.x = cos(t)*s;
-	pos.y = sin(t)*s;
-	pos.z = dis(rng);
-
-	return pos;
-}
-
-glm::vec3 randomVel(glm::vec3 pos)
-{
-	// Initial velocity is 'orbital' velocity from position
-	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(0, 0, 1));
-	float orbital_vel = sqrt(2 * glm::length(vel));
-	vel = glm::normalize(vel)*orbital_vel / 100000.f;
-	return vel;
-}
-
-void randBodies(const int size, std::vector<Body>& bods)
-{
-	for (int i = 0; i < size; i++)
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+		1000.0f / ImGui::GetIO().Framerate,
+		ImGui::GetIO().Framerate);
+	float fps = ImGui::GetIO().Framerate;
+	if (frames.size() > 100) //Max seconds to show
 	{
-		glm::vec3 pos = randomPos();
-		glm::vec3 vel = randomVel(pos);
-		bods.push_back(
-			Body(pos,
-				vel,
-				disMass(rng)
-			)
-		);
+		for (size_t i = 1; i < frames.size(); i++)
+		{
+			frames[i - 1] = frames[i];
+		}
+		frames[frames.size() - 1] = fps;
 	}
+	else
+	{
+		frames.push_back(fps);
+	}
+	ImGui::Separator();
+	ImGui::PlotHistogram("Framerate", &frames[0], frames.size(), 0, NULL, 0.0f, 100.0f);
 }
 
 int main(void)
 {
-	double lastTime = glfwGetTime();
-	int nbFrames = 0;
-
 	initGLFW();
 	initGLEW();
 	initGFX();
+	
+	std::vector<Body> bodies(AMOUNT);
 
-	std::vector<Body> bodies;
-	randBodies(AMOUNT, bodies);
+	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver);
+
+	wm[0].value()->addDrawables(&showFps);
+
+	ImGui::CreateContext();
+	ImGui_ImplGlfw_InitForOpenGL(window, false);
+	ImGui_ImplOpenGL3_Init("#version 330");
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		double currentTime = glfwGetTime();
-		nbFrames++;
-		if (currentTime - lastTime >= 1.0)
-		{
-			printf("%f ms/frame\n", 1000.0 / double(nbFrames));
-			nbFrames = 0;
-			lastTime += 1.0;
-		}
-
 		if (!pause)
 		{
 			for (auto& body : bodies)
@@ -93,16 +74,25 @@ int main(void)
 			{
 				body.update();
 			}
+			
+			ImGui_ImplOpenGL3_NewFrame();
+			ImGui_ImplGlfw_NewFrame();
+			ImGui::NewFrame();		
+
+			wm.drawAll();
+
+			ImGui::Render();
+			ImGui::EndFrame();
 
 			drawBodies((GLfloat*)&bodies[0]);
+
+			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 			glfwSwapBuffers(window);
 		}
 
 		glfwPollEvents();
 	}
-
-	bodies.~vector();
 
 	glfwTerminate();
 

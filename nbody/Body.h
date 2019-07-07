@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <random>
 
 #include <glm.hpp>
 
@@ -13,10 +14,17 @@ class Body {
 	glm::vec3 acc;
 
 public:
+	Body();
 	Body(glm::vec3 p,
 		glm::vec3 v,
 		float mass);
 	~Body();
+
+	static std::random_device seed;
+	static std::mt19937 rng;
+	static std::uniform_real_distribution<> dis;
+	static std::uniform_real_distribution<> disMass;
+
 	double Mass();
 	glm::vec3 Vel();
 	glm::vec3 Acc();

@@ -1,5 +1,40 @@
 #include "Body.h"
 
+std::random_device Body::seed;
+std::mt19937 Body::rng(seed());
+std::uniform_real_distribution<> Body::dis(0, 1);
+std::uniform_real_distribution<> Body::disMass(0.1, 1);
+
+glm::vec3 randomPos()
+{
+	glm::vec3 pos;
+	float t = Body::dis(Body::rng) * 2.f * PI;
+	float s = Body::dis(Body::rng);
+	pos.x = cos(t)*s;
+	pos.y = sin(t)*s;
+	pos.z = Body::dis(Body::rng);
+
+	return pos;
+}
+
+glm::vec3 randomVel(glm::vec3 pos)
+{
+	// Initial velocity is 'orbital' velocity from position
+	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(0, 0, 1));
+	float orbital_vel = sqrt(2 * glm::length(vel));
+	vel = glm::normalize(vel)*orbital_vel / 100000.f;
+	return vel;
+}
+
+Body::Body()
+{
+	pos = randomPos();
+	vel = randomVel(pos);
+	acc = glm::vec3(0, 0, 0);
+	mass = disMass(rng);
+}
+
+
 Body::Body(glm::vec3 p,
 	glm::vec3 v,
 	float mass)
