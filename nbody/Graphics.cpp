@@ -210,7 +210,7 @@ void initGFX()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void drawBodies(GLfloat* bods)
+void drawBodies(Body* bods)
 {
 	glClearColor(0.01f, 0.10f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

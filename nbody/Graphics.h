@@ -17,4 +17,4 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 int initGLFW();
 int initGLEW();
 void initGFX();
-void drawBodies(GLfloat* bods);
+void drawBodies(Body* bods);

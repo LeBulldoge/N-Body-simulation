@@ -13,29 +13,23 @@
 #include "imgui/imgui_impl_opengl3.h"
 
 extern bool pause = false;
-static WindowManager wm(5);
-static std::vector<float> frames;
 
 void showFps()
 {
+	static std::vector<float> fps;
 	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
 		1000.0f / ImGui::GetIO().Framerate,
 		ImGui::GetIO().Framerate);
-	float fps = ImGui::GetIO().Framerate;
-	if (frames.size() > 100) //Max seconds to show
+	if (fps.size() > 100)
 	{
-		for (size_t i = 1; i < frames.size(); i++)
-		{
-			frames[i - 1] = frames[i];
-		}
-		frames[frames.size() - 1] = fps;
+		fps.erase(fps.begin());
 	}
 	else
 	{
-		frames.push_back(fps);
+		fps.push_back(ImGui::GetIO().Framerate);
 	}
 	ImGui::Separator();
-	ImGui::PlotHistogram("Framerate", &frames[0], frames.size(), 0, NULL, 0.0f, 100.0f);
+	ImGui::PlotHistogram("Framerate", fps.data(), fps.size(), 0, NULL, 0.0f, 60.0f, ImVec2(325, 30));
 }
 
 int main(void)
@@ -46,7 +40,8 @@ int main(void)
 	
 	std::vector<Body> bodies(AMOUNT);
 
-	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver);
+	WindowManager wm(5);
+	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver, true, true, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
 
 	wm[0].value()->addDrawables(&showFps);
 
@@ -84,13 +79,13 @@ int main(void)
 			ImGui::Render();
 			ImGui::EndFrame();
 
-			drawBodies((GLfloat*)&bodies[0]);
+			drawBodies(bodies.data());
 
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 			glfwSwapBuffers(window);
 		}
-
+		pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
 		glfwPollEvents();
 	}
 
