@@ -7,6 +7,7 @@
 #include "Constants.h"
 #include "Body.h"
 #include "Graphics.h"
+#include "Camera.h"
 #include "WindowManager.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
@@ -37,13 +38,18 @@ int main(void)
 	initGLFW();
 	initGLEW();
 	
+	int fbW = WIDTH;
+	int fbH = HEIGHT;
+
 	glm::mat4 model(1.f);
 
 	glm::mat4 projection(1.f);
-	projection = glm::perspective(glm::radians(30.f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.f);
+	projection = glm::perspective(glm::radians(45.f), (float)fbW / (float)fbH, 0.1f, 100.f);
 
-	glm::mat4 view(1.f);
-	view = glm::lookAt(glm::vec3(0.f, 0.f, 4.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	Camera camera(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	camera.update();
+
+	glm::mat4 view = camera.getView();
 
 	glm::mat4 MVP = projection * view;
 
@@ -80,6 +86,24 @@ int main(void)
 			{
 				body.update();
 			}
+
+			if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+				camera.moveF();
+			if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+				camera.moveB();
+			if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+				camera.moveL();
+			if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+				camera.moveR();
+
+			camera.update();
+
+			view = camera.getView();
+
+			glfwGetFramebufferSize(window, &fbW, &fbH);
+			projection = glm::perspective(glm::radians(45.f), (float)fbW / (float)fbH, 0.1f, 100.f);
+
+			MVP = projection * view;
 		
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
@@ -90,9 +114,6 @@ int main(void)
 			ImGui::Render();
 			ImGui::EndFrame();
 
-			//view = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-			//MVP = projection * view;
-
 			drawBodies(bodies.data(), MVP);
 
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -100,6 +121,7 @@ int main(void)
 			glfwSwapBuffers(window);
 
 		}
+
 		pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
 		glfwPollEvents();
 	}

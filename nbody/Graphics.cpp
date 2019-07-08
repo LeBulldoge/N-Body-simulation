@@ -213,8 +213,10 @@ void initGFX(const glm::mat4& MVP)
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
-	glDisable(GL_CULL_FACE);
 	glUseProgram(0);
 }
 
@@ -251,4 +253,6 @@ void drawBodies(Body* bods, const glm::mat4& MVP)
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
+
+	glUseProgram(0);
 }
