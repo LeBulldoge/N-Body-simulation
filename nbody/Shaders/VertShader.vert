@@ -8,14 +8,13 @@ float scale = 0.06f;
 out float Mass;
 out vec2 UV;
 
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 MVP;
 
 void main()
 {
 	gl_PointSize = 2.f;
-	vec3 actualPos = inPos + cubeVert * (inMass * inPos.z * scale);
-	gl_Position = vec4(actualPos, 1.0); 
+	vec3 actualPos = inPos + cubeVert * inMass;
+	gl_Position = MVP * vec4(actualPos, 1.0); 
 	Mass = inMass;
 	UV = cubeVert.xy + vec2(0.5, 0.5);
 }

@@ -36,7 +36,18 @@ int main(void)
 {
 	initGLFW();
 	initGLEW();
-	initGFX();
+	
+	glm::mat4 model(1.f);
+
+	glm::mat4 projection(1.f);
+	projection = glm::perspective(45.f, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.f);
+
+	glm::mat4 view(1.f);
+	view = glm::lookAt(glm::vec3(0.f, 0.f, 50.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+
+	glm::mat4 MVP = projection * view * model;
+
+	initGFX(MVP);
 	
 	std::vector<Body> bodies(AMOUNT);
 
@@ -53,10 +64,10 @@ int main(void)
 	{
 		if (!pause)
 		{
-			for (auto& body : bodies)
+			for (Body& body : bodies)
 			{
 				body.resetG();
-				for (auto& other : bodies)
+				for (Body& other : bodies)
 				{
 					if (body != other)
 					{
@@ -65,7 +76,7 @@ int main(void)
 				}
 			}
 
-			for (auto& body : bodies)
+			for (Body& body : bodies)
 			{
 				body.update();
 			}
@@ -79,7 +90,10 @@ int main(void)
 			ImGui::Render();
 			ImGui::EndFrame();
 
-			drawBodies(bodies.data());
+			view = glm::lookAt(glm::vec3(0.f, 0.f, 10.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+			MVP = projection * view * model;
+
+			drawBodies(bodies.data(), MVP);
 
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

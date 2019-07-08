@@ -83,7 +83,7 @@ void Body::addG(Body& b)
 	float r2 = glm::dot(dist, dist);
 	float r3 = r2 * glm::sqrt(r2 + 0.25f * 0.25f);
 	//Calculating force
-	float F = ((b.mass * G) / (r3 + 0.01f));
+	float F = (b.mass * G) / (r3 + 0.01f);
 	//Acceleration
 	acc += F * dist;
 }

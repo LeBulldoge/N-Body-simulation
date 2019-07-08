@@ -1,6 +1,6 @@
 #pragma once
 
-const float step = 100.f; //86400.0f is 24 hours
+const float step = 10.f; //86400.0f is 24 hours
 const double G = 6.673e-11;
 const double AU = 1.49597893e11;
 

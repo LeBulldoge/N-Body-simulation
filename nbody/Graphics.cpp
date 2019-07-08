@@ -150,7 +150,7 @@ GLuint loadTextureDDS(const char* imagePath)
 }
 
 
-void initGFX()
+void initGFX(const glm::mat4& MVP)
 {
 	Shader shader;
 	shader.source(GL_VERTEX_SHADER, "Shaders/VertShader.vert");
@@ -199,22 +199,24 @@ void initGFX()
 	texture = loadTextureDDS("texture.dds");
 
 	glViewport(0, 0, WIDTH, HEIGHT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho(0, WIDTH, 0, HEIGHT, 0, 1);
+	glUniformMatrix4fv(glGetAttribLocation(program, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glDisable(GL_CULL_FACE);
 }
 
-void drawBodies(Body* bods)
+void drawBodies(Body* bods, const glm::mat4& MVP)
 {
 	glClearColor(0.01f, 0.10f, 0.15f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
+
+	glUniformMatrix4fv(glGetAttribLocation(program, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE0, texture);
