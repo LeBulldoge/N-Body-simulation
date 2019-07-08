@@ -10,10 +10,13 @@ GLuint sampler;
 GLuint program;
 GLFWwindow* window;
 
-void window_size_callback(GLFWwindow* window, int width, int height)
+int frameBufferWidth = WIDTH;
+int frameBufferHeight = HEIGHT;
+
+void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH)
 {
-	glViewport(0, 0, width, height);
-}
+	glViewport(0, 0, fbW, fbH);
+};
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -51,6 +54,7 @@ int initGLFW()
 	glfwWindowHint(GLFW_SAMPLES, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	window = glfwCreateWindow(WIDTH, HEIGHT, "N-Body simulation", NULL, NULL);
@@ -60,7 +64,9 @@ int initGLFW()
 		return -1;
 	}
 
-	glfwSetWindowSizeCallback(window, window_size_callback);
+	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+
 	glfwSetKeyCallback(window, key_callback);
 
 	glfwMakeContextCurrent(window);
@@ -157,6 +163,7 @@ void initGFX(const glm::mat4& MVP)
 	shader.source(GL_FRAGMENT_SHADER, "Shaders/FragShader.frag");
 	shader.link();
 	program = shader.ID();
+	glUseProgram(program);
 
 	sampler = glGetUniformLocation(program, "bodyTexture");
 
@@ -199,7 +206,7 @@ void initGFX(const glm::mat4& MVP)
 	texture = loadTextureDDS("texture.dds");
 
 	glViewport(0, 0, WIDTH, HEIGHT);
-	glUniformMatrix4fv(glGetAttribLocation(program, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
+	glUniformMatrix4fv(glGetUniformLocation(program, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -208,6 +215,7 @@ void initGFX(const glm::mat4& MVP)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glDisable(GL_CULL_FACE);
+	glUseProgram(0);
 }
 
 void drawBodies(Body* bods, const glm::mat4& MVP)
@@ -216,7 +224,7 @@ void drawBodies(Body* bods, const glm::mat4& MVP)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
 
-	glUniformMatrix4fv(glGetAttribLocation(program, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
+	glUniformMatrix4fv(glGetUniformLocation(program, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE0, texture);

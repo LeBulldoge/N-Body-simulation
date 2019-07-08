@@ -13,7 +13,7 @@
 extern GLFWwindow* window;
 extern bool pause;
 
-void window_size_callback(GLFWwindow* window, int width, int height);
+void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 int initGLFW();
 int initGLEW();

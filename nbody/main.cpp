@@ -40,18 +40,18 @@ int main(void)
 	glm::mat4 model(1.f);
 
 	glm::mat4 projection(1.f);
-	projection = glm::perspective(45.f, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.f);
+	projection = glm::perspective(glm::radians(30.f), (float)WIDTH / (float)HEIGHT, 0.1f, 100.f);
 
 	glm::mat4 view(1.f);
-	view = glm::lookAt(glm::vec3(0.f, 0.f, 50.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	view = glm::lookAt(glm::vec3(0.f, 0.f, 4.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 
-	glm::mat4 MVP = projection * view * model;
+	glm::mat4 MVP = projection * view;
 
 	initGFX(MVP);
 	
 	std::vector<Body> bodies(AMOUNT);
 
-	WindowManager wm(5);
+	WindowManager wm(1);
 	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver, true, true, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
 
 	wm[0].value()->addDrawables(&showFps);
@@ -80,7 +80,7 @@ int main(void)
 			{
 				body.update();
 			}
-			
+		
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui_ImplGlfw_NewFrame();
 			ImGui::NewFrame();		
@@ -90,14 +90,15 @@ int main(void)
 			ImGui::Render();
 			ImGui::EndFrame();
 
-			view = glm::lookAt(glm::vec3(0.f, 0.f, 10.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-			MVP = projection * view * model;
+			//view = glm::lookAt(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+			//MVP = projection * view;
 
 			drawBodies(bodies.data(), MVP);
 
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 			glfwSwapBuffers(window);
+
 		}
 		pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
 		glfwPollEvents();
