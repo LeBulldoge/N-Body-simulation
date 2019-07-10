@@ -2,7 +2,7 @@
 
 std::random_device Body::seed;
 std::mt19937 Body::rng(seed());
-std::uniform_real_distribution<> Body::dis(0, 1);
+std::uniform_real_distribution<> Body::dis(-1, 1);
 std::uniform_real_distribution<> Body::disMass(0.1, 1);
 
 glm::vec3 randomPos()
@@ -75,15 +75,15 @@ void Body::update()
 	pos += vel * step;
 }
 
-void Body::addG(Body& b)
+void Body::addG(const glm::vec4& other)
 {
 	//Distance vector
-	glm::vec3 dist = b.pos - pos;
+	glm::vec3 dist = glm::vec3(other.x, other.y, other.z) - pos;
 	//Normalized distance
 	float r2 = glm::dot(dist, dist);
 	float r3 = r2 * glm::sqrt(r2 + 0.25f * 0.25f);
 	//Calculating force
-	float F = (b.mass * G) / (r3 + 0.01f);
+	float F = (other.w * G) / (r3 + 0.01f);
 	//Acceleration
 	acc += F * dist;
 }

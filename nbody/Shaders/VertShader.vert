@@ -3,7 +3,7 @@ layout (location = 0) in vec3 cubeVert;
 layout (location = 1) in vec3 inPos;
 layout (location = 2) in float inMass;
 
-float scale = 0.02f;
+float scale = 0.01f;
 
 out float Mass;
 out vec2 UV;

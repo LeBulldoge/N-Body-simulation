@@ -29,7 +29,7 @@ public:
 	glm::vec3 Vel();
 	glm::vec3 Acc();
 	glm::vec3 Pos();
-	void addG(Body& b);
+	void addG(const glm::vec4& other);
 	void update();
 	void resetG();
 	bool operator != (Body & b);

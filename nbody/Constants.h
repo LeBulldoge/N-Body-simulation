@@ -7,6 +7,6 @@ const double AU = 1.49597893e11;
 const int WIDTH = 1280;
 const int HEIGHT = 720;
 
-const int AMOUNT = 250;
-
+const int AMOUNT = 1000;
+const float THETA = 0.5f;
 const float PI = 3.14159265358979323846f;

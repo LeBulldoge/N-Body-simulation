@@ -4,6 +4,11 @@ GLuint VBO;
 GLuint VAO;
 GLuint VBOcube;
 GLuint VAOcube;
+GLuint VBObox;
+GLuint VAObox;
+GLuint VBOboxframe;
+GLuint VAOboxframe;
+
 GLuint texture;
 GLuint sampler;
 
@@ -67,7 +72,7 @@ int initGLFW()
 	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
 	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
 
-	glfwSetKeyCallback(window, key_callback);
+	//glfwSetKeyCallback(window, key_callback);
 
 	glfwMakeContextCurrent(window);
 
@@ -169,10 +174,43 @@ void initGFX(const glm::mat4& MVP)
 
 	float vertices[] = 
 	{ 
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		-0.5f,  0.5f, 0.0f,
-		0.5f, 0.5f, 0.0f, 
+		-0.5f, -0.5f, 0.f,
+		0.5f, -0.5f, 0.f,
+		-0.5f,  0.5f, 0.f,
+		0.5f, 0.5f, 0.f, 
+	};
+
+	float boxVertices[] =
+	{
+		0.5f, 0.5f, -0.5f,
+		-0.5f, 0.5f, -0.5f,
+		-0.5f, 0.5f,  0.5f,
+		0.5f, 0.5f,  0.5f,
+
+		0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f,  0.5f,
+		-0.5f, -0.5f, -0.5f,
+		0.5f, -0.5f, -0.5f,
+
+		0.5f,  0.5f, 0.5f,
+		-0.5f,  0.5f, 0.5f,
+		-0.5f, -0.5f, 0.5f,
+		0.5f, -0.5f, 0.5f,
+
+		0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f,  0.5f, -0.5f,
+		0.5f,  0.5f, -0.5f,
+
+		-0.5f,  0.5f,  0.5f,
+		-0.5f,  0.5f, -0.5f,
+		-0.5f, -0.5f, -0.5f,
+		-0.5f, -0.5f,  0.5f,
+
+		0.5f,  0.5f, -0.5f,
+		0.5f,  0.5f,  0.5f,
+		0.5f, -0.5f,  0.5f,
+		0.5f, -0.5f, -0.5f
 	};
 
 	glGenBuffers(1, &VBOcube);

@@ -4,7 +4,6 @@
 
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
 
 #include "Constants.h"
 
@@ -16,10 +15,7 @@ public:
 	~Camera();
 	void update();
 	glm::mat4 getView();
-	void moveF();
-	void moveB();
-	void moveL();
-	void moveR();
+	void input(GLFWwindow* window);
 
 private:
 
@@ -31,7 +27,8 @@ private:
 	glm::vec3 _up;
 	glm::vec3 _front;
 
-	glm::mat4 projection;
-	glm::mat4 view;
+	float _deltaTime;
+	float _lastFrame;
 
+	glm::mat4 _view;
 };
