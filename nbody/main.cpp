@@ -66,6 +66,7 @@ int main()
 		{
 			tree.Calculate();
 			tree.Update();
+
 			camera.input(window);
 			camera.update();
 
@@ -77,9 +78,7 @@ int main()
 
 			wm.drawAll();
 			glfwSwapBuffers(window);
-
 		}
-
 		pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
 		glfwPollEvents();
 	}

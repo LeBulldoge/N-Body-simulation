@@ -1,4 +1,5 @@
 #include "Octree.h"
+#include <thread>
 
 Octree::Octree()
 {
@@ -30,11 +31,24 @@ void Octree::Update()
 
 void Octree::Calculate()
 {
-	for (Body& body : pBodies)
+	std::thread calc0([&]
 	{
-		body.resetG();
-		mRoot.calculateForce(body);
-	}
+		for (int i = 0; i < AMOUNT / 2; i++)
+		{
+			pBodies[i].resetG();
+			mRoot.calculateForce(pBodies[i]);
+		}
+	});
+	std::thread calc1([&]
+	{
+		for (int i = AMOUNT / 2; i < AMOUNT; i++)
+		{
+			pBodies[i].resetG();
+			mRoot.calculateForce(pBodies[i]);
+		}
+	});
+	calc0.join();
+	calc1.join();
 }
 
 Body* Octree::getBodies()
