@@ -21,6 +21,7 @@ Node::Node(glm::vec3 center, float width, std::vector<Body> bodies)
 	{
 		pBodies.push_back(std::make_shared<Body>(bodies[i]));
 	}
+	mActive = true;
 }
 
 Node::~Node()
@@ -32,7 +33,7 @@ void Node::populate()
 {
 	if (pBodies.size() > 1)
 	{
-		mChildren.erase(mChildren.begin(), mChildren.end());
+		mActive = true;
 		mLeaf = false;
 		mChildren.reserve(8);
 		mChildren.push_back(Node(mRegion.getMax(), mRegion.width / 2.f));
@@ -55,6 +56,10 @@ void Node::populate()
 				}
 			}
 		}
+		
+		pBodies.erase(pBodies.begin(), pBodies.end());
+		pBodies.shrink_to_fit();
+
 		for (Node& child : mChildren)
 		{
 			child.populate();
@@ -64,9 +69,15 @@ void Node::populate()
 	else
 	{
 		mLeaf = true;
+		if (pBodies.empty())
+		{
+			mActive = false;
+		}
+		else
+		{
+			mActive = true;
+		}
 	}
-	//auto remove = std::remove_if(mChildren.begin(), mChildren.end(), [](Node& child) { return child.empty(); });
-	//mChildren.erase(remove, mChildren.end());
 	
 	if (!pBodies.empty())
 	{
@@ -79,6 +90,11 @@ bool Node::empty()
 	return pBodies.empty();
 }
 
+bool Node::active()
+{
+	return mActive;
+}
+
 void Node::update()
 {
 	if (!mLeaf)
@@ -87,7 +103,7 @@ void Node::update()
 		mCenterOfMass = { 0.f, 0.f, 0.f, 0.f };
 		for (Node& child : mChildren)
 		{
-			if (!child.empty())
+			if (child.active())
 			{
 				child.update();
 				mCenterOfMass += child.mCenterOfMass;
@@ -100,13 +116,17 @@ void Node::update()
 	}
 	else
 	{
+		/*if (!isInside(pBodies[0]))
+		{
+			pBodies.pop_back();
+		}*/
 		mCenterOfMass = glm::vec4(pBodies[0]->Pos(), pBodies[0]->Mass());
 	}
 }
 
 void Node::calculateForce(Body& body)
 {
-	if (glm::all(glm::lessThan((mRegion.width / 2) / glm::abs(body.Pos() - glm::vec3(mCenterOfMass)), glm::vec3(THETA))) || mLeaf)
+	if ((mRegion.width) / glm::distance(body.Pos(), glm::vec3(mCenterOfMass)) < THETA || mLeaf)
 	{
 		body.addG(mCenterOfMass);
 	}
@@ -114,7 +134,7 @@ void Node::calculateForce(Body& body)
 	{
 		for (Node& child : mChildren)
 		{
-			if (!child.empty())
+			if (child.active())
 			{
 				child.calculateForce(body);
 			}

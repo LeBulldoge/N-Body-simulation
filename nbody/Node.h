@@ -29,6 +29,7 @@ public:
 
 	void update();
 	bool empty();
+	bool active();
 	void populate();
 	void calculateForce(Body& body);
 	bool isInside(std::shared_ptr<Body>& body);
@@ -42,5 +43,6 @@ private:
 	glm::vec4 mCenterOfMass;
 	std::vector<Node> mChildren;
 	bool mLeaf;
+	bool mActive;
 };
 
