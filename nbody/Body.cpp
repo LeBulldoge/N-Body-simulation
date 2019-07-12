@@ -95,6 +95,13 @@ void Body::resetG()
 	acc.z = 0.0;
 }
 
+void Body::reset()
+{
+	pos = { 0.f };
+	acc = { 0.f };
+	vel = { 0.f };
+}
+
 bool Body::operator != (Body & b)
 {
 	if (mass != b.mass)

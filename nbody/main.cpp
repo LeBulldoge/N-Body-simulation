@@ -39,13 +39,15 @@ int main()
 	int fbW = WIDTH;
 	int fbH = HEIGHT;
 
+	glm::mat4 model(1.f);
+
 	glm::mat4 projection(1.f);
 	projection = glm::perspective(glm::radians(45.f), (float)fbW / (float)fbH, 0.1f, 100.f);
 
 	Camera camera = Camera(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 	camera.update();
 
-	glm::mat4 MVP = projection * camera.getView();
+	glm::mat4 MVP = projection * camera.getView() * model;
 
 	initGFX(MVP);
 
@@ -72,12 +74,13 @@ int main()
 
 			glfwGetFramebufferSize(window, &fbW, &fbH);
 			projection = glm::perspective(glm::radians(45.f), (float)fbW / fbH, 0.1f, 100.f);
-			MVP = projection * camera.getView();
+			MVP = projection * camera.getView() * model;
 
 			drawBodies(tree.getBodies(), MVP);
 
 			wm.drawAll();
 			glfwSwapBuffers(window);
+			
 		}
 		pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
 		glfwPollEvents();

@@ -32,5 +32,6 @@ public:
 	void addG(const glm::vec4& other);
 	void update();
 	void resetG();
+	void reset();
 	bool operator != (Body & b);
 };

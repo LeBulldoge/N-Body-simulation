@@ -9,6 +9,7 @@ public:
 	~Octree();
 
 	void Update();
+	void Init();
 	void Calculate();
 	Body* getBodies();
 

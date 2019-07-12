@@ -78,11 +78,6 @@ void Node::populate()
 			mActive = true;
 		}
 	}
-	
-	if (!pBodies.empty())
-	{
-		update();
-	}	
 }
 
 bool Node::empty()
