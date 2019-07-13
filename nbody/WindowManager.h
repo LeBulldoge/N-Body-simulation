@@ -30,7 +30,7 @@ public:
 
 WindowManager::WindowManager()
 {
-
+	ImGui::StyleColorsDark();
 }
 
 WindowManager::WindowManager(int size)

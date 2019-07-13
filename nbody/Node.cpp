@@ -7,19 +7,17 @@ Node::Node()
 
 Node::Node(glm::vec3 center, float width)
 {
-	mRegion.center = center;
-	mRegion.width = width;
+	mRegion = { center, width };
 	mCenterOfMass = { center,  0.f };
 }
 
 Node::Node(glm::vec3 center, float width, std::vector<Body> bodies)
 {
-	mRegion.center = center;
-	mRegion.width = width;
+	mRegion = { center, width };
 	mCenterOfMass = { center,  0.f };
 	for (int i = 0; i < bodies.size(); i++)
 	{
-		pBodies.push_back(std::make_shared<Body>(bodies[i]));
+		pBodies.emplace_back(std::make_shared<Body>(bodies[i]));
 	}
 	mActive = true;
 }
@@ -36,14 +34,14 @@ void Node::populate()
 		mActive = true;
 		mLeaf = false;
 		mChildren.reserve(8);
-		mChildren.push_back(Node(mRegion.getMax(), mRegion.width / 2.f));
-		mChildren.push_back(Node(glm::vec3(mRegion.getMax().x, mRegion.getMax().y, mRegion.getMin().z), mRegion.width / 2.f));
-		mChildren.push_back(Node(glm::vec3(mRegion.getMin().x, mRegion.getMax().y, mRegion.getMin().z), mRegion.width / 2.f));
-		mChildren.push_back(Node(glm::vec3(mRegion.getMin().x, mRegion.getMax().y, mRegion.getMax().z), mRegion.width / 2.f));
-		mChildren.push_back(Node(mRegion.getMin(), mRegion.width / 2.f));
-		mChildren.push_back(Node(glm::vec3(mRegion.getMin().x, mRegion.getMin().y, mRegion.getMax().z), mRegion.width / 2.f));
-		mChildren.push_back(Node(glm::vec3(mRegion.getMax().x, mRegion.getMin().y, mRegion.getMax().z), mRegion.width / 2.f));
-		mChildren.push_back(Node(glm::vec3(mRegion.getMax().x, mRegion.getMin().y, mRegion.getMin().z), mRegion.width / 2.f));
+		mChildren.emplace_back(mRegion.getMax(), mRegion.width / 2.f);
+		mChildren.emplace_back(glm::vec3(mRegion.getMax().x, mRegion.getMax().y, mRegion.getMin().z), mRegion.width / 2.f);
+		mChildren.emplace_back(glm::vec3(mRegion.getMin().x, mRegion.getMax().y, mRegion.getMin().z), mRegion.width / 2.f);
+		mChildren.emplace_back(glm::vec3(mRegion.getMin().x, mRegion.getMax().y, mRegion.getMax().z), mRegion.width / 2.f);
+		mChildren.emplace_back(mRegion.getMin(), mRegion.width / 2.f);
+		mChildren.emplace_back(glm::vec3(mRegion.getMin().x, mRegion.getMin().y, mRegion.getMax().z), mRegion.width / 2.f);
+		mChildren.emplace_back(glm::vec3(mRegion.getMax().x, mRegion.getMin().y, mRegion.getMax().z), mRegion.width / 2.f);
+		mChildren.emplace_back(glm::vec3(mRegion.getMax().x, mRegion.getMin().y, mRegion.getMin().z), mRegion.width / 2.f);
 
 		for (std::shared_ptr<Body>& body : pBodies)
 		{
@@ -115,15 +113,19 @@ void Node::update()
 		{
 			pBodies.pop_back();
 		}*/
-		mCenterOfMass = glm::vec4(pBodies[0]->Pos(), pBodies[0]->Mass());
+		mCenterOfMass = glm::vec4(pBodies[0]->getPos(), pBodies[0]->getMass());
 	}
 }
 
-void Node::calculateForce(Body& body)
+void Node::calculateForce(Body& body, float& theta)
 {
-	if ((mRegion.width) / glm::distance(body.Pos(), glm::vec3(mCenterOfMass)) < THETA || mLeaf)
+	if (mLeaf)
 	{
-		body.addG(mCenterOfMass);
+		body.addForce(mCenterOfMass);
+	}
+	else if(mRegion.width / glm::distance(body.getPos(), glm::vec3(mCenterOfMass)) < theta)
+	{
+		body.addForce(mCenterOfMass);
 	}
 	else
 	{
@@ -131,7 +133,7 @@ void Node::calculateForce(Body& body)
 		{
 			if (child.active())
 			{
-				child.calculateForce(body);
+				child.calculateForce(body, theta);
 			}
 		}
 	}
@@ -139,7 +141,7 @@ void Node::calculateForce(Body& body)
 
 bool Node::isInside(std::shared_ptr<Body>& body)
 {
-	return glm::all(glm::lessThan(glm::abs(body->Pos() - mRegion.center), glm::vec3(mRegion.width)));
+	return glm::all(glm::lessThan(glm::abs(body->getPos() - mRegion.center), glm::vec3(mRegion.width)));
 }
 
 void Node::addBody(std::shared_ptr<Body>& body)

@@ -10,10 +10,10 @@ in vec3 fragPos;
 void main()
 {
 	vec3 bodyColor = vec3(Mass); 
-	vec3 diffuseColor = vec3(0.5f, 0.2f, 0.1f);
-	vec3 ambient = vec3(0.1f, 0.05f, 0.01f);
+	vec3 diffuseColor = vec3(0.5f, 0.5f, 0.90f);
+	vec3 ambient = vec3(0.05f, 0.1f, 0.15f);
 
-	vec3 norm = normalize(normal);
+	vec3 norm = normal;
 	vec3 lightDir = vec3(0.f, 0.f, 0.f) - fragPos;
 	float brightness = dot(norm, lightDir) / (length(lightDir) * length(norm));
 	brightness = clamp(brightness, 0, 1);

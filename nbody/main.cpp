@@ -13,24 +13,6 @@
 
 extern bool pause = false;
 
-void showFps()
-{
-	static std::vector<float> fps;
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-		1000.0f / ImGui::GetIO().Framerate,
-		ImGui::GetIO().Framerate);
-	if (fps.size() > 100)
-	{
-		fps.erase(fps.begin());
-	}
-	else
-	{
-		fps.push_back(ImGui::GetIO().Framerate);
-	}
-	ImGui::Separator();
-	ImGui::PlotHistogram("Framerate", fps.data(), fps.size(), 0, NULL, 0.0f, 60.0f, ImVec2(325, 30));
-}
-
 int main()
 {
 	initGLFW();
@@ -53,11 +35,34 @@ int main()
 
 	Octree tree;
 
-	WindowManager wm(1);
+	WindowManager wm(2);
 	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver, true, true, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
+	wm.addWindow(400, 200, "Controls", ImGuiCond_FirstUseEver);
 
-	wm[0].value()->addDrawables(&showFps);
+	wm[0].value()->addDrawables([]()
+	{
+		static std::vector<float> fps;
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+			1000.0f / ImGui::GetIO().Framerate,
+			ImGui::GetIO().Framerate);
+		if (fps.size() > 100)
+		{
+			fps.erase(fps.begin());
+		}
+		else
+		{
+			fps.push_back(ImGui::GetIO().Framerate);
+		}
+		ImGui::Separator();
+		ImGui::PlotHistogram("Framerate", fps.data(), fps.size(), 0, NULL, 0.0f, 60.0f, ImVec2(325, 30));
+	});
 
+	wm[1].value()->addDrawables([&tree]()
+	{
+		ImGui::SliderFloat("THETA", &tree.getTheta(), 0.f, 2.f, "%.5f");
+		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0 will cause instability.", AMOUNT);
+	});
+	
 	ImGui::CreateContext();
 	ImGui_ImplGlfw_InitForOpenGL(window, false);
 	ImGui_ImplOpenGL3_Init("#version 330");
@@ -68,7 +73,7 @@ int main()
 		{
 			tree.Calculate();
 			tree.Update();
-
+			
 			camera.input(window);
 			camera.update();
 
@@ -76,7 +81,7 @@ int main()
 			projection = glm::perspective(glm::radians(45.f), (float)fbW / fbH, 0.1f, 100.f);
 			MVP = projection * camera.getView() * model;
 
-			drawBodies(tree.getBodies(), MVP);
+			drawBodies(tree.getBodiesData(), MVP);
 
 			wm.drawAll();
 			glfwSwapBuffers(window);

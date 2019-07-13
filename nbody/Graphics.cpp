@@ -99,9 +99,9 @@ void initGFX(const glm::mat4& MVP)
 
 	const float vertices[] =
 	{
-		-X,  Y,  Z,   -X,  Y, -Z,
+		-X,  Y,  Z,  -X,  Y, -Z,
 		 X,  Y,  Z,   X,  Y, -Z,
-		-X,  Y, -Z,   -X,  Y,  Z,
+		-X,  Y, -Z,  -X,  Y,  Z,
 		 X,  Y, -Z,   X,  Y,  Z,
 					  
 		 Y,  Z,  X,   Y,  Z, -X,
@@ -110,9 +110,9 @@ void initGFX(const glm::mat4& MVP)
 		 Y, -Z, -X,   Y, -Z,  X,
 					  
 		 Z,  X,  Y,   Z,  X, -Y,
-		-Z,  X,  Y,   -Z,  X, -Y,
+		-Z,  X,  Y,  -Z,  X, -Y,
 		 Z, -X,  Y,   Z, -X, -Y,
-		-Z, -X,  Y,   -Z, -X, -Y,
+		-Z, -X,  Y,  -Z, -X, -Y,
 	};
 
 	const unsigned short elements[] = {
@@ -190,7 +190,7 @@ void initGFX(const glm::mat4& MVP)
 
 void drawBodies(Body* bods, const glm::mat4& MVP)
 {
-	//glClearColor(0.01f, 0.10f, 0.15f, 1.0f);
+	glClearColor(0.01f, 0.03f, 0.08f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(program);
 

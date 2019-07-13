@@ -31,7 +31,7 @@ public:
 	bool empty();
 	bool active();
 	void populate();
-	void calculateForce(Body& body);
+	void calculateForce(Body& body, float& theta);
 	bool isInside(std::shared_ptr<Body>& body);
 	void addBody(std::shared_ptr<Body>& body);
 	void moveBody(std::shared_ptr<Body>& body);

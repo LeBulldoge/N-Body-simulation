@@ -18,5 +18,5 @@ void main()
 	fragPos = actualPos;
 	gl_Position = MVP * vec4(actualPos, 1.0); 
 	Mass = inMass;
-	normal = inNormal * inMass * scale;
+	normal = inNormal;
 }
