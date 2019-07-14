@@ -18,4 +18,4 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 int initGLFW();
 int initGLEW();
 void initGFX(const glm::mat4& MVP);
-void drawBodies(Body* bods, const glm::mat4& MVP);
+void drawBodies(const Body* bods, const glm::mat4& MVP);

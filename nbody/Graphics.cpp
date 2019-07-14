@@ -12,12 +12,12 @@ GLFWwindow* window;
 int frameBufferWidth = WIDTH;
 int frameBufferHeight = HEIGHT;
 
-void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH)
+void framebuffer_resize_callback(GLFWwindow* wnd, int fbW, int fbH)
 {
 	glViewport(0, 0, fbW, fbH);
 };
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+static void key_callback(GLFWwindow* wnd, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 	{
@@ -56,7 +56,7 @@ int initGLFW()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(WIDTH, HEIGHT, "N-Body simulation", NULL, NULL);
+	window = glfwCreateWindow(WIDTH, HEIGHT, "N-Body simulation", nullptr, nullptr);
 	if (!window)
 	{
 		glfwTerminate();
@@ -140,30 +140,30 @@ void initGFX(const glm::mat4& MVP)
 
 	glGenBuffers(1, &VBOshape);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOshape);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 
 	glGenVertexArrays(1, &VAOshape);
 	glBindVertexArray(VAOshape);
 
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 6, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 6, nullptr);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(float) * 6, (void*)(sizeof(float) * 3));
 
 	glGenBuffers(1, &IBOshape);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBOshape);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), &elements, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), nullptr, GL_STREAM_DRAW);
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Body), nullptr);
 
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
@@ -188,7 +188,7 @@ void initGFX(const glm::mat4& MVP)
 	glUseProgram(0);
 }
 
-void drawBodies(Body* bods, const glm::mat4& MVP)
+void drawBodies(const Body* bods, const glm::mat4& MVP)
 {
 	glClearColor(0.01f, 0.03f, 0.08f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -198,16 +198,16 @@ void drawBodies(Body* bods, const glm::mat4& MVP)
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOshape);
-	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 6, (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, false, sizeof(float) * 6, nullptr);
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, false, sizeof(float) * 6, (void*)(sizeof(float) * 3));
 
 	glEnableVertexAttribArray(2);
 	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), NULL, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), nullptr, GL_STREAM_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, AMOUNT * sizeof(Body), bods);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)0);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Body), nullptr);
 	glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
 
 	glVertexAttribDivisor(0, 0);
@@ -217,7 +217,7 @@ void drawBodies(Body* bods, const glm::mat4& MVP)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBOshape);
 	int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	glDrawElementsInstanced(GL_TRIANGLES, size / sizeof(unsigned short), GL_UNSIGNED_SHORT, 0, AMOUNT);
+	glDrawElementsInstanced(GL_TRIANGLES, size / sizeof(unsigned short), GL_UNSIGNED_SHORT, nullptr, AMOUNT);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);

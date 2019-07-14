@@ -1,10 +1,5 @@
 #pragma once
-#include <string>
-#include <random>
-
 #include <glm.hpp>
-
-#include "Constants.h"
 
 class Body {
 
@@ -15,19 +10,20 @@ private:
 	glm::vec3 mAcc;
 
 public:
-	Body();
+	Body() noexcept;
 	Body(glm::vec3 pos,
 		glm::vec3 vel,
 		float mass);
 	~Body();
 
-	double getMass();
-	glm::vec3 getVel();
-	glm::vec3 getAcc();
-	glm::vec3 getPos();
+	float getMass() noexcept;
+	glm::vec3 getVel() noexcept;
+	glm::vec3 getAcc() noexcept;
+	glm::vec3 getPos() noexcept;
 	void addForce(const glm::vec4& other);
-	void update();
-	void resetForce();
-	void reset();
-	bool operator != (Body & b);
+	void update() noexcept;
+	void resetForce() noexcept;
+	void reset() noexcept;
+	bool operator != (Body& b);
+	bool operator != (float& bMass);
 };

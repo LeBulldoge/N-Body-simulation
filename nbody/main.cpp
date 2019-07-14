@@ -33,7 +33,7 @@ int main()
 
 	initGFX(MVP);
 
-	Octree tree;
+	Octree tree(AMOUNT);
 
 	WindowManager wm(2);
 	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver, true, true, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
@@ -51,16 +51,23 @@ int main()
 		}
 		else
 		{
-			fps.push_back(ImGui::GetIO().Framerate);
+			fps.emplace_back(ImGui::GetIO().Framerate);
 		}
 		ImGui::Separator();
 		ImGui::PlotHistogram("Framerate", fps.data(), fps.size(), 0, NULL, 0.0f, 60.0f, ImVec2(325, 30));
 	});
 
+	//???
 	wm[1].value()->addDrawables([&tree]()
 	{
 		ImGui::SliderFloat("THETA", &tree.getTheta(), 0.f, 2.f, "%.5f");
-		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0 will cause instability.", AMOUNT);
+		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0.0 will cause instability.", AMOUNT);
+		if (ImGui::Button("Calculate"))
+		{
+			tree.BruteForceCalculate();
+		}
+		ImGui::SameLine();
+		ImGui::TextWrapped("Calculates the gravitational pull between bodies using the brute force algorithm (O(n^2)).");
 	});
 	
 	ImGui::CreateContext();

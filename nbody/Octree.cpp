@@ -1,9 +1,7 @@
 #include "Octree.h"
 #include <thread>
 
-
-
-Octree::Octree()
+Octree::Octree(const int amount) : mAmount(amount)
 {
 	mTheta = 0.5f;
 
@@ -11,38 +9,37 @@ Octree::Octree()
 	mDist = std::uniform_real_distribution<>(-1, 1);
 	mDistMass = std::uniform_real_distribution<>(0.1, 1);
 
-	pBodies.reserve(AMOUNT);
+	mBodies.reserve(mAmount);
 	glm::vec3 tempPos;
-	for (int i = 0; i < AMOUNT-1; i++)
+	for (int i = 0; i < mAmount - 1; i++)
 	{
 		tempPos = randomPos();
-		pBodies.emplace_back(tempPos, randomVel(tempPos), mDistMass(mRng));
+		mBodies.emplace_back(tempPos, randomVel(tempPos), mDistMass(mRng));
 	}
-	pBodies.emplace_back(glm::vec3(0.f), glm::vec3(0.f), 3.f);
-	
-	mRoot = Node(glm::vec3(0.f), 1.f, pBodies);
+	mBodies.emplace_back(glm::vec3(0.f), glm::vec3(0.f), 3.f);
+
+	mRoot = Node(glm::vec3(0.f), 1.f, mBodies);
 	mRoot.populate();
 	mRoot.update();
 }
 
 Octree::~Octree()
 {
-	
+
 }
 
 void Octree::Update()
 {
-	for (Body& body : pBodies)
+	for (Body& body : mBodies)
 	{
 		body.update();
 	}
-	pBodies[AMOUNT-1].reset();
+	mBodies[mAmount - 1].reset();
 	mRoot.update();
 }
 
-//TODO:
+//TO DO:
 //Resource race? (std::mutex is too slow)
-//Fix typecasting
 void Octree::Calculate()
 {
 	auto calcLambda = [&](int i, const int max)
@@ -50,8 +47,8 @@ void Octree::Calculate()
 		//printf("Thread %i start: i = %i\n", std::this_thread::get_id(), i);
 		for (i; i < max; i++)
 		{
-			pBodies[i].resetForce();
-			mRoot.calculateForce(pBodies[i], mTheta);
+			mBodies[i].resetForce();
+			mRoot.calculateForce(mBodies[i], mTheta);
 		}
 		//printf("Thread %i finish: i = %i\n", std::this_thread::get_id(), i);
 	};
@@ -59,10 +56,50 @@ void Octree::Calculate()
 	const int cores = std::thread::hardware_concurrency();
 
 	std::vector<std::thread> threads;
+	threads.reserve(cores);
 
 	for (int i = 0; i < cores; i++)
 	{
-		threads.emplace_back(calcLambda, (int)(AMOUNT * ((float)i / cores)), (int)(AMOUNT * ((float)(i + 1) / cores)));
+		threads.emplace_back(calcLambda,
+			static_cast<int>(mAmount * (static_cast<float>(i) / cores)),
+			static_cast<int>(mAmount * (static_cast<float>(i + 1) / cores)));
+	}
+
+	for (std::thread& thread : threads)
+	{
+		thread.join();
+	}
+}
+
+void Octree::BruteForceCalculate()
+{
+	auto calcLambda = [&](int i, const int max)
+	{
+		//printf("Thread %i start: i = %i\n", std::this_thread::get_id(), i);
+		for (i; i < max; i++)
+		{
+			mBodies[i].resetForce();
+			for (Body& other : mBodies)
+			{
+				if (mBodies[i] != other)
+				{
+					mBodies[i].addForce({ other.getPos(), other.getMass() });
+				}
+			}
+		}
+		//printf("Thread %i finish: i = %i\n", std::this_thread::get_id(), i);
+	};
+
+	const int cores = std::thread::hardware_concurrency();
+
+	std::vector<std::thread> threads;
+	threads.reserve(cores);
+
+	for (int i = 0; i < cores; i++)
+	{
+		threads.emplace_back(calcLambda,
+			static_cast<int>(mAmount * (static_cast<float>(i) / cores)),
+			static_cast<int>(mAmount * (static_cast<float>(i + 1) / cores)));
 	}
 
 	for (std::thread& thread : threads)
@@ -73,7 +110,7 @@ void Octree::Calculate()
 
 Body* Octree::getBodiesData()
 {
-	return pBodies.data();
+	return mBodies.data();
 }
 
 float & Octree::getTheta()

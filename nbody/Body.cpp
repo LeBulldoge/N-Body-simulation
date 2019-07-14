@@ -1,8 +1,8 @@
 #include "Body.h"
+#include "Constants.h"
 
 
-
-Body::Body() : Body({0.f, 0.f, 0.f}, { 0.f, 0.f, 0.f }, 0.f)
+Body::Body() noexcept : Body({0.f, 0.f, 0.f}, { 0.f, 0.f, 0.f }, 0.f)
 {
 
 }
@@ -18,24 +18,24 @@ Body::~Body()
 
 }
 
-double Body::getMass()
+float Body::getMass() noexcept
 {
 	return mMass;
 }
-glm::vec3 Body::getAcc()
+glm::vec3 Body::getAcc() noexcept
 {
 	return mAcc;
 }
-glm::vec3 Body::getVel()
+glm::vec3 Body::getVel() noexcept
 {
 	return mVel;
 }
-glm::vec3 Body::getPos()
+glm::vec3 Body::getPos() noexcept
 {
 	return mPos;
 }
 
-void Body::update()
+void Body::update() noexcept
 {
 	//Velocity
 	mVel += mAcc * step;
@@ -46,22 +46,22 @@ void Body::update()
 void Body::addForce(const glm::vec4& other)
 {
 	//Distance vector
-	glm::vec3 dist = glm::vec3(other) - mPos;
+	const glm::vec3 dist = glm::vec3(other) - mPos;
 	//Normalized distance
-	float r2 = glm::dot(dist, dist);
-	float r3 = r2 * glm::sqrt(r2 + 0.25f * 0.25f);
+	const float r2 = glm::dot(dist, dist);
+	const float r3 = r2 * glm::sqrt(r2 + 0.25f * 0.25f);
 	//Calculating force
-	float F = (other.w * G) / (r3 + 0.01f);
+	const float F = (other.w * static_cast<float>(G)) / (r3 + 0.01f);
 	//Acceleration
 	mAcc += F * dist;
 }
 
-void Body::resetForce()
+void Body::resetForce() noexcept
 {
 	mAcc = { 0.f };
 }
 
-void Body::reset()
+void Body::reset() noexcept
 {
 	mPos = { 0.f };
 	mAcc = { 0.f };
@@ -71,6 +71,18 @@ void Body::reset()
 bool Body::operator != (Body & b)
 {
 	if (mMass != b.mMass)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool Body::operator != (float& bMass)
+{
+	if (mMass != bMass)
 	{
 		return true;
 	}

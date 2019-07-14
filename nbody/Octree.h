@@ -6,11 +6,12 @@ class Octree
 {
 public:
 
-	Octree();
+	Octree(int amount);
 	~Octree();
 
 	void Update();
 	void Calculate();
+	void BruteForceCalculate();
 	Body* getBodiesData();
 	float& getTheta();
 	glm::vec3 randomPos();
@@ -21,7 +22,8 @@ private:
 	BoundingBox mTotalRegion;
 
 	Node mRoot;
-	std::vector<Body> pBodies;
+	const int mAmount;
+	std::vector<Body> mBodies;
 	float mTheta;
 
 	std::random_device mSeed;

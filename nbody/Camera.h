@@ -14,8 +14,8 @@ public:
 	Camera(glm::vec3 pos, glm::vec3 target, glm::vec3 up);
 	~Camera();
 	void update();
-	glm::mat4 getView();
-	void input(GLFWwindow* window);
+	glm::mat4 getView() noexcept;
+	void input(GLFWwindow* window) noexcept;
 
 private:
 
@@ -27,8 +27,8 @@ private:
 	glm::vec3 _up;
 	glm::vec3 _front;
 
-	float _deltaTime;
-	float _lastFrame;
+	double _deltaTime;
+	double _lastFrame;
 
 	glm::mat4 _view;
 };

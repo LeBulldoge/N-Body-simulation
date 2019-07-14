@@ -8,8 +8,8 @@ class WindowManager
 {
 private:
 
-	std::vector<windowPtr> _windows;
-	windowPtr _pinnedPtr;
+	std::vector<windowPtr> pWindows;
+	windowPtr pPinned;
 
 public:
 
@@ -17,7 +17,8 @@ public:
 	WindowManager(int size);
 	~WindowManager();
 
-	void addWindow(int width, int height, std::string title, ImGuiCond cond, bool visibility = true, bool pinned = false, ImGuiWindowFlags flags = 0);
+	template<typename... T>
+	void addWindow(T&&... t);
 	void destroyWindow(windowPtr ptr);
 	void drawAll();
 	void move(int a, int b);
@@ -35,7 +36,7 @@ WindowManager::WindowManager()
 
 WindowManager::WindowManager(int size)
 {
-	_windows.reserve(size);
+	pWindows.reserve(size);
 }
 
 WindowManager::~WindowManager()
@@ -43,14 +44,15 @@ WindowManager::~WindowManager()
 
 }
 
-void WindowManager::addWindow(int width, int height, std::string title, ImGuiCond cond, bool visibility, bool pinned, ImGuiWindowFlags flags)
+template<typename... T>
+void WindowManager::addWindow(T&&... t)
 {
-	_windows.emplace_back(std::make_shared<WMwindow>(width, height, title, cond, visibility, pinned, flags));
+	pWindows.emplace_back(std::make_shared<WMwindow>(std::forward<T>(t)...));
 }
 
 void WindowManager::destroyWindow(windowPtr ptr)
 {
-	_windows.erase(std::remove(_windows.begin(), _windows.end(), ptr), _windows.end());
+	pWindows.erase(std::remove(pWindows.begin(), pWindows.end(), ptr), pWindows.end());
 }
 
 void WindowManager::drawAll()
@@ -61,7 +63,7 @@ void WindowManager::drawAll()
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	for (windowPtr ptr : _windows)
+	for (windowPtr ptr : pWindows)
 	{
 		ptr->draw();
 	}
@@ -74,17 +76,17 @@ void WindowManager::drawAll()
 
 void WindowManager::move(const int a, const int b)
 {
-	std::swap(_windows[a], _windows[b]);
+	std::swap(pWindows[a], pWindows[b]);
 }
 
 void WindowManager::resetPinnedStatus()
 {
-	for (windowPtr ptr : _windows)
+	for (windowPtr ptr : pWindows)
 	{
-		if (ptr->getPinned() && ptr != _pinnedPtr)
+		if (ptr->getPinned() && ptr != pPinned)
 		{
-			if (_pinnedPtr != nullptr) _pinnedPtr->unpin();
-			_pinnedPtr = ptr;
+			if (pPinned != nullptr) pPinned->unpin();
+			pPinned = ptr;
 			ImGui::SetWindowFocus(ptr->getTitle().c_str());
 		}
 	}
@@ -92,15 +94,15 @@ void WindowManager::resetPinnedStatus()
 
 std::optional<windowPtr> WindowManager::operator[](const unsigned int i)
 {
-	if (_windows.size() > i)
+	if (pWindows.size() > i)
 	{
-		return _windows[i];
+		return pWindows[i];
 	}
 	return std::nullopt;
 }
 std::optional<windowPtr> WindowManager::operator[](std::string title)
 {
-	for (windowPtr ptr : _windows)
+	for (windowPtr ptr : pWindows)
 	{
 		if (ptr->getTitle() == title) return ptr;
 	}
@@ -109,9 +111,9 @@ std::optional<windowPtr> WindowManager::operator[](std::string title)
 
 size_t WindowManager::size()
 {
-	return _windows.size();
+	return pWindows.size();
 }
 bool WindowManager::empty()
 {
-	return _windows.empty();
+	return pWindows.empty();
 }

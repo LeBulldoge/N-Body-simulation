@@ -1,6 +1,11 @@
 #pragma once
 #include "Body.h"
+
+#include <vector>
+#include <memory>
 #include <algorithm>
+
+#include "Constants.h"
 
 struct BoundingBox
 {
@@ -24,17 +29,16 @@ class Node
 public:
 	Node();
 	Node(glm::vec3 center, float width);
-	Node(glm::vec3 center, float width, std::vector<Body> bodies);
+	Node(glm::vec3 center, float width, const std::vector<Body>& bodies);
 	~Node();
 
 	void update();
-	bool empty();
-	bool active();
+	bool empty() const;
+	bool active() const;
 	void populate();
 	void calculateForce(Body& body, float& theta);
-	bool isInside(std::shared_ptr<Body>& body);
+	bool isInside(const std::shared_ptr<Body>& body) const;
 	void addBody(std::shared_ptr<Body>& body);
-	void moveBody(std::shared_ptr<Body>& body);
 
 private:
 

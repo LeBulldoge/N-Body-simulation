@@ -11,7 +11,7 @@ Node::Node(glm::vec3 center, float width)
 	mCenterOfMass = { center,  0.f };
 }
 
-Node::Node(glm::vec3 center, float width, std::vector<Body> bodies)
+Node::Node(glm::vec3 center, float width, const std::vector<Body>& bodies)
 {
 	mRegion = { center, width };
 	mCenterOfMass = { center,  0.f };
@@ -78,12 +78,12 @@ void Node::populate()
 	}
 }
 
-bool Node::empty()
+inline bool Node::empty() const
 {
 	return pBodies.empty();
 }
 
-bool Node::active()
+inline bool Node::active() const
 {
 	return mActive;
 }
@@ -119,27 +119,30 @@ void Node::update()
 
 void Node::calculateForce(Body& body, float& theta)
 {
-	if (mLeaf)
+	if (body != mCenterOfMass.w)
 	{
-		body.addForce(mCenterOfMass);
-	}
-	else if(mRegion.width / glm::distance(body.getPos(), glm::vec3(mCenterOfMass)) < theta)
-	{
-		body.addForce(mCenterOfMass);
-	}
-	else
-	{
-		for (Node& child : mChildren)
+		if (mLeaf)
 		{
-			if (child.active())
+			body.addForce(mCenterOfMass);
+		}
+		else if (mRegion.width / glm::distance(body.getPos(), glm::vec3(mCenterOfMass)) < theta)
+		{
+			body.addForce(mCenterOfMass);
+		}
+		else
+		{
+			for (Node& child : mChildren)
 			{
-				child.calculateForce(body, theta);
+				if (child.active())
+				{
+					child.calculateForce(body, theta);
+				}
 			}
 		}
 	}
 }
 
-bool Node::isInside(std::shared_ptr<Body>& body)
+inline bool Node::isInside(const std::shared_ptr<Body>& body) const
 {
 	return glm::all(glm::lessThan(glm::abs(body->getPos() - mRegion.center), glm::vec3(mRegion.width)));
 }
@@ -147,22 +150,4 @@ bool Node::isInside(std::shared_ptr<Body>& body)
 void Node::addBody(std::shared_ptr<Body>& body)
 {
 	pBodies.push_back(std::move(body));
-}
-
-void Node::moveBody(std::shared_ptr<Body>& body)
-{
-	if (isInside(body))
-	{
-		pBodies.push_back(std::move(body));
-	}
-	else if (!mLeaf)
-	{
-		for (Node& child : mChildren)
-		{
-			if (isInside(body))
-			{
-				pBodies.push_back(std::move(body));
-			}
-		}
-	}
 }
