@@ -17,7 +17,7 @@ Octree::Octree(const int amount) : mAmount(amount)
 	}
 	mBodies.emplace_back(glm::vec3(0.f), glm::vec3(0.f), 5.f);
 
-	mRoot = Node(glm::vec3(0.f), 10.f, mBodies);
+	mRoot = Node(glm::vec3(0.f), 15.f, mBodies);
 	mRoot.populate(pBoxes);
 	mRoot.update();
 }
@@ -35,7 +35,7 @@ void Octree::Update()
 	}
 	mBodies[mAmount - 1].reset();
 	pBoxes.erase(pBoxes.begin(), pBoxes.end());
-	mRoot = Node(glm::vec3(0.f), 10.f, mBodies);
+	mRoot = Node(glm::vec3(0.f), 15.f, mBodies);
 	mRoot.populate(pBoxes);
 	mRoot.update();
 }
@@ -110,34 +110,39 @@ void Octree::BruteForceCalculate()
 	}
 }
 
-Body* Octree::getBodiesData()
+const Body* Octree::getBodiesData() noexcept
 {
 	return mBodies.data();
 }
 
-BoundingBox* Octree::getBoxesData()
+const int Octree::getBodiesAmount() noexcept
+{
+	return mAmount;
+}
+
+const BoundingBox* Octree::getBoxesData() noexcept
 {
 	return pBoxes.data();
 }
 
-int Octree::getBoxAmount()
+const int Octree::getBoxAmount() noexcept
 {
 	return pBoxes.size();
 }
 
-float & Octree::getTheta()
+float& Octree::getTheta() noexcept
 {
 	return mTheta;
 }
 
-glm::vec3 Octree::randomPos()
+glm::vec3 Octree::randomPos() noexcept
 {
 	glm::vec3 pos;
 	float t = mDist(mRng) * 2.f * PI;
 	float s = mDist(mRng) * PI;
-	pos.x = sin(t)*cos(s)*8.f;
-	pos.y = sin(t)*sin(s)*8.f;
-	pos.z = cos(t)*mDist(mRng)*8.f;
+	pos.x = sin(t)*cos(s) * 8.f;
+	pos.y = sin(t)*sin(s) * 8.f;
+	pos.z = cos(t)*mDist(mRng) * 8.f;
 
 	return pos;
 }
@@ -145,8 +150,8 @@ glm::vec3 Octree::randomPos()
 glm::vec3 Octree::randomVel(glm::vec3 pos)
 {
 	// Initial velocity is 'orbital' velocity from position
-	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(0, 0, 1));
+	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(1, 1, 1));
 	float orbital_vel = sqrt(2 * glm::length(vel));
-	vel = glm::normalize(vel)*orbital_vel / 20000.f;
+	vel = glm::normalize(vel) * orbital_vel / 20000.f;
 	return vel;
 }

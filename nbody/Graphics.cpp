@@ -90,7 +90,7 @@ int initGLEW()
 	return 0;
 }
 
-void initGFXBodies(const glm::mat4& MVP)
+void initGFXBodies(const glm::mat4& MVP, const int amount)
 {
 	Shader shader;
 	shader.source(GL_VERTEX_SHADER, "Shaders/VertShader.vert");
@@ -160,7 +160,7 @@ void initGFXBodies(const glm::mat4& MVP)
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), nullptr, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(Body), nullptr, GL_STREAM_DRAW);
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
@@ -178,6 +178,8 @@ void initGFXBodies(const glm::mat4& MVP)
 
 	glViewport(0, 0, WIDTH, HEIGHT);
 	glUniformMatrix4fv(glGetUniformLocation(programBodies, "MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
+
+	glEnable(GL_MULTISAMPLE);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -256,7 +258,7 @@ void initGFXBoxes(const glm::mat4& MVP, const int amount)
 	glUseProgram(0);
 }
 
-void drawBodies(const Body* bods, const glm::mat4& MVP)
+void drawBodies(const Body* bods, const glm::mat4& MVP, const int amount)
 {
 	glClearColor(0.01f, 0.03f, 0.08f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -271,8 +273,8 @@ void drawBodies(const Body* bods, const glm::mat4& MVP)
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, AMOUNT * sizeof(Body), nullptr, GL_STREAM_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, AMOUNT * sizeof(Body), bods);
+	glBufferData(GL_ARRAY_BUFFER, amount * sizeof(Body), nullptr, GL_STREAM_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, amount * sizeof(Body), bods);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Body), nullptr);
 	glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(Body), (void*)sizeof(glm::vec3));
 
@@ -282,7 +284,7 @@ void drawBodies(const Body* bods, const glm::mat4& MVP)
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBOshape);
 	int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-	glDrawElementsInstanced(GL_TRIANGLES, size / sizeof(unsigned short), GL_UNSIGNED_SHORT, nullptr, AMOUNT);
+	glDrawElementsInstanced(GL_TRIANGLES, size / sizeof(unsigned short), GL_UNSIGNED_SHORT, nullptr, amount);
 
 	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);

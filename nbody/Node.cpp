@@ -57,7 +57,7 @@ void Node::populate(std::vector<BoundingBox>& boxes)
 		}
 		
 		pBodies.erase(pBodies.begin(), pBodies.end());
-		pBodies.shrink_to_fit();
+		//pBodies.shrink_to_fit();
 
 		for (Node& child : mChildren)
 		{

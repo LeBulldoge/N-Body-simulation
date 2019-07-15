@@ -12,11 +12,12 @@ public:
 	void Update();
 	void Calculate();
 	void BruteForceCalculate();
-	Body* getBodiesData();
-	BoundingBox* getBoxesData();
-	int getBoxAmount();
-	float& getTheta();
-	glm::vec3 randomPos();
+	const Body* getBodiesData() noexcept;
+	const int getBodiesAmount() noexcept;
+	const BoundingBox* getBoxesData() noexcept;
+	const int getBoxAmount() noexcept;
+	float& getTheta() noexcept;
+	glm::vec3 randomPos() noexcept;
 	glm::vec3 randomVel(glm::vec3 pos);
 
 private:

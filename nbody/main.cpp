@@ -33,7 +33,7 @@ int main()
 
 	Octree tree(AMOUNT);
 
-	initGFXBodies(MVP);
+	initGFXBodies(MVP, tree.getBodiesAmount());
 	initGFXBoxes(MVP, tree.getBoxAmount());
 
 	WindowManager wm(2);
@@ -63,7 +63,7 @@ int main()
 	wm[1].value()->addDrawables([&tree, &showBoxes]()
 	{
 		ImGui::SliderFloat("THETA", &tree.getTheta(), 0.f, 2.f, "%.5f");
-		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0.0 will cause instability.", AMOUNT);
+		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0.0 will cause instability.", tree.getBodiesAmount());
 		if (ImGui::Button("Calculate"))
 		{
 			tree.BruteForceCalculate();
@@ -91,7 +91,7 @@ int main()
 			projection = glm::perspective(glm::radians(45.f), (float)fbW / fbH, 0.1f, 100.f);
 			MVP = projection * camera.getView() * model;
 
-			drawBodies(tree.getBodiesData(), MVP);
+			drawBodies(tree.getBodiesData(), MVP, tree.getBodiesAmount());
 			if (showBoxes)
 			{
 				drawBox(tree.getBoxesData(), MVP, tree.getBoxAmount());
