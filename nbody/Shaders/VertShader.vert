@@ -4,7 +4,7 @@ layout (location = 1) in vec3 inNormal;
 layout (location = 2) in vec3 inPos;
 layout (location = 3) in float inMass;
 
-float scale = 0.005f;
+float scale = 0.01f;
 
 out float Mass;
 out vec3 normal;

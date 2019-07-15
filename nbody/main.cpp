@@ -26,14 +26,15 @@ int main()
 	glm::mat4 projection(1.f);
 	projection = glm::perspective(glm::radians(45.f), (float)fbW / (float)fbH, 0.1f, 100.f);
 
-	Camera camera = Camera(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	Camera camera = Camera(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
 	camera.update();
 
 	glm::mat4 MVP = projection * camera.getView() * model;
 
-	initGFX(MVP);
-
 	Octree tree(AMOUNT);
+
+	initGFXBodies(MVP);
+	initGFXBoxes(MVP, tree.getBoxAmount());
 
 	WindowManager wm(2);
 	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver, true, true, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
@@ -57,8 +58,9 @@ int main()
 		ImGui::PlotHistogram("Framerate", fps.data(), fps.size(), 0, NULL, 0.0f, 60.0f, ImVec2(325, 30));
 	});
 
+	bool boxes = false;
 	//???
-	wm[1].value()->addDrawables([&tree]()
+	wm[1].value()->addDrawables([&tree, &boxes]()
 	{
 		ImGui::SliderFloat("THETA", &tree.getTheta(), 0.f, 2.f, "%.5f");
 		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0.0 will cause instability.", AMOUNT);
@@ -68,8 +70,9 @@ int main()
 		}
 		ImGui::SameLine();
 		ImGui::TextWrapped("Calculates the gravitational pull between bodies using the brute force algorithm (O(n^2)).");
+		ImGui::Checkbox("Draw octree", &boxes);
 	});
-	
+
 	ImGui::CreateContext();
 	ImGui_ImplGlfw_InitForOpenGL(window, false);
 	ImGui_ImplOpenGL3_Init("#version 330");
@@ -89,7 +92,10 @@ int main()
 			MVP = projection * camera.getView() * model;
 
 			drawBodies(tree.getBodiesData(), MVP);
-
+			if (boxes)
+			{
+				drawBox(tree.getBoxesData(), MVP, tree.getBoxAmount());
+			}
 			wm.drawAll();
 			glfwSwapBuffers(window);
 			

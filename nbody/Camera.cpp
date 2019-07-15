@@ -39,15 +39,15 @@ void Camera::input(GLFWwindow* window) noexcept
 	const double speed = 1 * _deltaTime;
 
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		_pos = {0.f, 0.f, -2.f};
+		_pos = {0.f, 0.f, -5.f};
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		_pos = { 0.f, 0.f, 2.f };
+		_pos = { 0.f, 0.f, 5.f };
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		_pos = { -2.f, 0.f, 0.f };
+		_pos = { -5.f, 0.f, 0.f };
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		_pos = { 2.f, 0.f, 0.f };
+		_pos = { 5.f, 0.f, 0.f };
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		_pos *= 1.01f;
+		_pos *= 1.05f;
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		_pos *= 0.99f;
+		_pos *= 0.95f;
 }

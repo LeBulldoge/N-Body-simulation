@@ -14,12 +14,12 @@ Octree::Octree(const int amount) : mAmount(amount)
 	for (int i = 0; i < mAmount - 1; i++)
 	{
 		tempPos = randomPos();
-		mBodies.emplace_back(tempPos, randomVel(tempPos), mDistMass(mRng));
+		mBodies.emplace_back(tempPos, randomVel(tempPos), 1.f);
 	}
-	mBodies.emplace_back(glm::vec3(0.f), glm::vec3(0.f), 3.f);
+	mBodies.emplace_back(glm::vec3(0.f), glm::vec3(0.f), 5.f);
 
-	mRoot = Node(glm::vec3(0.f), 1.f, mBodies);
-	mRoot.populate();
+	mRoot = Node(glm::vec3(0.f), 10.f, mBodies);
+	mRoot.populate(pBoxes);
 	mRoot.update();
 }
 
@@ -35,6 +35,9 @@ void Octree::Update()
 		body.update();
 	}
 	mBodies[mAmount - 1].reset();
+	pBoxes.erase(pBoxes.begin(), pBoxes.end());
+	mRoot = Node(glm::vec3(0.f), 10.f, mBodies);
+	mRoot.populate(pBoxes);
 	mRoot.update();
 }
 
@@ -111,6 +114,16 @@ void Octree::BruteForceCalculate()
 Body* Octree::getBodiesData()
 {
 	return mBodies.data();
+}
+
+BoundingBox* Octree::getBoxesData()
+{
+	return pBoxes.data();
+}
+
+int Octree::getBoxAmount()
+{
+	return pBoxes.size();
 }
 
 float & Octree::getTheta()

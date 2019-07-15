@@ -13,6 +13,8 @@ public:
 	void Calculate();
 	void BruteForceCalculate();
 	Body* getBodiesData();
+	BoundingBox* getBoxesData();
+	int getBoxAmount();
 	float& getTheta();
 	glm::vec3 randomPos();
 	glm::vec3 randomVel(glm::vec3 pos);
@@ -25,6 +27,8 @@ private:
 	const int mAmount;
 	std::vector<Body> mBodies;
 	float mTheta;
+
+	std::vector<BoundingBox> pBoxes;
 
 	std::random_device mSeed;
 	std::mt19937 mRng;

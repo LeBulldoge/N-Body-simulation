@@ -35,10 +35,13 @@ public:
 	void update();
 	bool empty() const;
 	bool active() const;
-	void populate();
+	void populate(std::vector<BoundingBox>& boxes);
 	void calculateForce(Body& body, float& theta);
 	bool isInside(const std::shared_ptr<Body>& body) const;
 	void addBody(std::shared_ptr<Body>& body);
+	BoundingBox getRegion() noexcept;
+	glm::vec4 getCenterOfMass() noexcept;
+
 
 private:
 

@@ -5,6 +5,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
+#include "Octree.h"
 #include "Shader.h"
 #include "Constants.h"
 #include "Body.h"
@@ -17,5 +18,7 @@ void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 int initGLFW();
 int initGLEW();
-void initGFX(const glm::mat4& MVP);
+void initGFXBodies(const glm::mat4& MVP);
+void initGFXBoxes(const glm::mat4& MVP, const int amount);
 void drawBodies(const Body* bods, const glm::mat4& MVP);
+void drawBox(const BoundingBox* boxes, const glm::mat4& MVP, const int amount);

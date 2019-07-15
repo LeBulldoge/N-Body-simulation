@@ -121,5 +121,11 @@
     <CopyFileToFolders Include="Shaders\VertShader.vert">
       <Filter>Shaders</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="Shaders\BoxFragShader.frag">
+      <Filter>Shaders</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Shaders\BoxVertShader.vert">
+      <Filter>Shaders</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

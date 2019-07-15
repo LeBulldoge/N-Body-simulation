@@ -27,10 +27,11 @@ Node::~Node()
 
 }
 
-void Node::populate()
+void Node::populate(std::vector<BoundingBox>& boxes)
 {
 	if (pBodies.size() > 1)
 	{
+		boxes.emplace_back(mRegion);
 		mActive = true;
 		mLeaf = false;
 		mChildren.reserve(8);
@@ -60,7 +61,7 @@ void Node::populate()
 
 		for (Node& child : mChildren)
 		{
-			child.populate();
+			child.populate(boxes);
 		}
 		
 	}
@@ -74,6 +75,7 @@ void Node::populate()
 		else
 		{
 			mActive = true;
+			boxes.emplace_back(mRegion);
 		}
 	}
 }
@@ -150,4 +152,14 @@ inline bool Node::isInside(const std::shared_ptr<Body>& body) const
 void Node::addBody(std::shared_ptr<Body>& body)
 {
 	pBodies.push_back(std::move(body));
+}
+
+BoundingBox Node::getRegion() noexcept
+{
+	return mRegion;
+}
+
+glm::vec4 Node::getCenterOfMass() noexcept
+{
+	return mCenterOfMass;
 }
