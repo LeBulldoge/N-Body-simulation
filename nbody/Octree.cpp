@@ -7,7 +7,6 @@ Octree::Octree(const int amount) : mAmount(amount)
 
 	mRng = std::mt19937(mSeed());
 	mDist = std::uniform_real_distribution<>(-1, 1);
-	mDistMass = std::uniform_real_distribution<>(0.1, 1);
 
 	mBodies.reserve(mAmount);
 	glm::vec3 tempPos;
@@ -136,9 +135,9 @@ glm::vec3 Octree::randomPos()
 	glm::vec3 pos;
 	float t = mDist(mRng) * 2.f * PI;
 	float s = mDist(mRng) * PI;
-	pos.x = sin(t)*cos(s);
-	pos.y = sin(t)*sin(s);
-	pos.z = cos(t)*mDist(mRng);
+	pos.x = sin(t)*cos(s)*8.f;
+	pos.y = sin(t)*sin(s)*8.f;
+	pos.z = cos(t)*mDist(mRng)*8.f;
 
 	return pos;
 }
@@ -148,6 +147,6 @@ glm::vec3 Octree::randomVel(glm::vec3 pos)
 	// Initial velocity is 'orbital' velocity from position
 	glm::vec3 vel = glm::cross(glm::vec3(pos), glm::vec3(0, 0, 1));
 	float orbital_vel = sqrt(2 * glm::length(vel));
-	vel = glm::normalize(vel)*orbital_vel / 10000.f;
+	vel = glm::normalize(vel)*orbital_vel / 20000.f;
 	return vel;
 }

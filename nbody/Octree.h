@@ -33,6 +33,5 @@ private:
 	std::random_device mSeed;
 	std::mt19937 mRng;
 	std::uniform_real_distribution<> mDist;
-	std::uniform_real_distribution<> mDistMass;
 	
 };

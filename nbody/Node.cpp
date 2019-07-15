@@ -151,7 +151,7 @@ inline bool Node::isInside(const std::shared_ptr<Body>& body) const
 
 void Node::addBody(std::shared_ptr<Body>& body)
 {
-	pBodies.push_back(std::move(body));
+	pBodies.emplace_back(std::forward<std::shared_ptr<Body>>(body));
 }
 
 BoundingBox Node::getRegion() noexcept

@@ -6,6 +6,6 @@ in float width;
 
 void main()
 {
-	vec3 color = {1 - width, 1 - width, 1 - width};
+	vec3 color = vec3(2 / width, width, width);
 	gl_FragColor = vec4(color, 1.f);
 }
