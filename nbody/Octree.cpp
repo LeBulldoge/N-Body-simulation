@@ -42,34 +42,40 @@ void Octree::Update()
 
 //TO DO:
 //Resource race? (std::mutex is too slow)
+//Starting new threads every time is inefficient
 void Octree::Calculate()
 {
-	auto calcLambda = [&](int i, const int max)
+	//auto calcLambda = [&](int i, const int max)
+	//{
+	//	//printf("Thread %i start: i = %i\n", std::this_thread::get_id(), i);
+	//	for (i; i < max; i++)
+	//	{
+	//		mBodies[i].resetForce();
+	//		mRoot.calculateForce(mBodies[i], mTheta);
+	//	}
+	//	//printf("Thread %i finish: i = %i\n", std::this_thread::get_id(), i);
+	//};
+
+	//const int cores = std::thread::hardware_concurrency();
+
+	//std::vector<std::thread> threads;
+	//threads.reserve(cores);
+
+	//for (int i = 0; i < cores; i++)
+	//{
+	//	threads.emplace_back(calcLambda,
+	//		static_cast<int>(mAmount * (static_cast<float>(i) / cores)),
+	//		static_cast<int>(mAmount * (static_cast<float>(i + 1) / cores)));
+	//}
+
+	//for (std::thread& thread : threads)
+	//{
+	//	thread.join();
+	//}
+	for (Body& body : mBodies)
 	{
-		//printf("Thread %i start: i = %i\n", std::this_thread::get_id(), i);
-		for (i; i < max; i++)
-		{
-			mBodies[i].resetForce();
-			mRoot.calculateForce(mBodies[i], mTheta);
-		}
-		//printf("Thread %i finish: i = %i\n", std::this_thread::get_id(), i);
-	};
-
-	const int cores = std::thread::hardware_concurrency();
-
-	std::vector<std::thread> threads;
-	threads.reserve(cores);
-
-	for (int i = 0; i < cores; i++)
-	{
-		threads.emplace_back(calcLambda,
-			static_cast<int>(mAmount * (static_cast<float>(i) / cores)),
-			static_cast<int>(mAmount * (static_cast<float>(i + 1) / cores)));
-	}
-
-	for (std::thread& thread : threads)
-	{
-		thread.join();
+		body.resetForce();
+		mRoot.calculateForce(body, mTheta);
 	}
 }
 

@@ -2,6 +2,8 @@
 #include "Node.h"
 #include <random>
 
+//Needs rewriting to optimize for multithreading and better tree structure
+//Too many allocations every tree build
 class Octree
 {
 public:
