@@ -7,3 +7,6 @@ The simulation running with 25000 bodies, θ = 0.5 and 4 threads:
 
 Visualization of the Barnes-Hut algorithm:
 ![Screenshot](Docs/screenshot1.png)
+
+Formations of bodies:
+![Screenshot](Docs/screenshot2.png)
