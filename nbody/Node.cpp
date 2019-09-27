@@ -146,7 +146,7 @@ void Node::calculateForce(Body& body, float& theta)
 
 inline bool Node::isInside(const std::shared_ptr<Body>& body) const
 {
-	return glm::all(glm::lessThan(glm::abs(body->getPos() - mRegion.center), glm::vec3(mRegion.width)));
+	return glm::all(glm::lessThanEqual(glm::abs(body->getPos() - mRegion.center), glm::vec3(mRegion.width)));
 }
 
 void Node::addBody(std::shared_ptr<Body>& body)

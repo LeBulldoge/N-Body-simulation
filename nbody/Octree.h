@@ -4,6 +4,7 @@
 
 //Needs rewriting to optimize for multithreading and better tree structure
 //Too many allocations every tree build
+//std::make_shared copy-constructs, making calculations incorrect
 class Octree
 {
 public:

@@ -68,6 +68,20 @@ void Body::reset() noexcept
 	mVel = { 0.f };
 }
 
+bool Body::operator==(Body & b)
+{
+	if (mPos == b.mPos)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+
+
 bool Body::operator != (Body & b)
 {
 	if (mMass != b.mMass)

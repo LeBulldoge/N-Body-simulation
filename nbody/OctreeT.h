@@ -4,8 +4,8 @@ class OctreeT
 {
 public:
 	OctreeT();
-
 	~OctreeT();
+
 private:
 
 };

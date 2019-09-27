@@ -20,5 +20,5 @@ int initGLFW();
 int initGLEW();
 void initGFXBodies(const glm::mat4& MVP, const int amount);
 void initGFXBoxes(const glm::mat4& MVP, const int amount);
-void drawBodies(const Body* bods, const glm::mat4& MVP, const int amount);
+void drawBodies(const std::shared_ptr<Body>* bods, const glm::mat4& MVP, const int amount);
 void drawBox(const BoundingBox* boxes, const glm::mat4& MVP, const int amount);

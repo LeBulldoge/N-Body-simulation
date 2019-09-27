@@ -24,6 +24,7 @@ public:
 	void update() noexcept;
 	void resetForce() noexcept;
 	void reset() noexcept;
+	bool operator == (Body & b);
 	bool operator != (Body& b);
 	bool operator != (float& bMass);
 };
