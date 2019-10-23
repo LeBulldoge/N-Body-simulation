@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.h"
 #include <random>
+#include <atomic>
 
 //Needs rewriting to optimize for multithreading and better tree structure
 //Too many allocations every tree build
@@ -8,12 +9,13 @@
 class Octree
 {
 public:
+	bool isWorking = true;
 
 	Octree(int amount);
 	~Octree();
 
 	void Update();
-	void Calculate();
+	void Calculate(int i, const int max, int num);
 	void BruteForceCalculate();
 	const Body* getBodiesData() noexcept;
 	const int getBodiesAmount() noexcept;
@@ -27,6 +29,8 @@ private:
 
 	BoundingBox mTotalRegion;
 
+	std::atomic<int> mUpdateCount;
+	
 	Node mRoot;
 	const int mAmount;
 	std::vector<Body> mBodies;

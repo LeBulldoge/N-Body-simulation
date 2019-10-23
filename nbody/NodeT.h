@@ -29,7 +29,7 @@ public:
 	bool isInside(const glm::vec3& pos);
 
 private:
-	NodeT mChildren[8];
+	NodeT* mChildren[8];
 
 	glm::vec3 mCenterOfMass;
 	float mMass;

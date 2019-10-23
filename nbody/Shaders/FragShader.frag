@@ -1,6 +1,6 @@
 #version 330 core
 
-out vec4 gl_FragColor;
+out vec4 glFragColor;
 in float Mass;
 
 void main()
@@ -10,5 +10,5 @@ void main()
 
 	vec3 color = bodyColor * diffuseColor;
 
-	gl_FragColor = vec4(color, 1.f);
+	glFragColor = vec4(color, 1.f);
 }

@@ -20,6 +20,8 @@ Octree::Octree(const int amount) : mAmount(amount)
 	mRoot = Node(glm::vec3(0.f), 15.f, mBodies);
 	mRoot.populate(pBoxes);
 	mRoot.update();
+
+	mUpdateCount = 0;
 }
 
 Octree::~Octree()
@@ -29,55 +31,46 @@ Octree::~Octree()
 
 void Octree::Update()
 {
-	for (Body& body : mBodies)
+	if (mUpdateCount.load() >= 15)
 	{
-		body.update();
+		for (Body& body : mBodies)
+		{
+			body.update();
+		}
+		mBodies[mAmount - 1].reset();
+		pBoxes.erase(pBoxes.begin(), pBoxes.end());
+		mRoot = Node(glm::vec3(0.f), 15.f, mBodies);
+		mRoot.populate(pBoxes);
+		mRoot.update();
+		mUpdateCount = 0;
 	}
-	mBodies[mAmount - 1].reset();
-	pBoxes.erase(pBoxes.begin(), pBoxes.end());
-	mRoot = Node(glm::vec3(0.f), 15.f, mBodies);
-	mRoot.populate(pBoxes);
-	mRoot.update();
 }
 
-//TO DO:
-//Resource race? (std::mutex is too slow)
-//Starting new threads every time is inefficient
-void Octree::Calculate()
+void Octree::Calculate(int i, const int max, int num)
 {
-	//auto calcLambda = [&](int i, const int max)
-	//{
-	//	//printf("Thread %i start: i = %i\n", std::this_thread::get_id(), i);
-	//	for (i; i < max; i++)
-	//	{
-	//		mBodies[i].resetForce();
-	//		mRoot.calculateForce(mBodies[i], mTheta);
-	//	}
-	//	//printf("Thread %i finish: i = %i\n", std::this_thread::get_id(), i);
-	//};
-
-	//const int cores = std::thread::hardware_concurrency();
-
-	//std::vector<std::thread> threads;
-	//threads.reserve(cores);
-
-	//for (int i = 0; i < cores; i++)
-	//{
-	//	threads.emplace_back(calcLambda,
-	//		static_cast<int>(mAmount * (static_cast<float>(i) / cores)),
-	//		static_cast<int>(mAmount * (static_cast<float>(i + 1) / cores)));
-	//}
-
-	//for (std::thread& thread : threads)
-	//{
-	//	thread.join();
-	//}
-	for (Body& body : mBodies)
+	int start;
+	while (isWorking)
 	{
-		body.resetForce();
-		mRoot.calculateForce(body, mTheta);
+		if (!(mUpdateCount.load() & num))
+		{
+			start = i;
+			//printf("Thread %i start: i = %i\n", std::this_thread::get_id(), i);
+			for (i; i < max; i++)
+			{
+				mBodies[i].resetForce();
+				mRoot.calculateForce(mBodies[i], mTheta);
+			}
+			i = start;
+			mUpdateCount |= num;
+			//printf("Thread %i finish: i = %i, (%i/%i)\n", std::this_thread::get_id(), i, mUpdateCount.load(), mUpdateCount.load());
+		}
+		else
+		{
+			std::this_thread::yield();
+		}
 	}
-}
+		//printf("Thread %i finish: i = %i\n", std::this_thread::get_id(), i);
+};
 
 void Octree::BruteForceCalculate()
 {

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <vector>
+#include <thread>
 
 #include <glm.hpp>
 
@@ -10,6 +11,8 @@
 #include "Camera.h"
 #include "WindowManager.h"
 #include "Octree.h"
+
+
 
 extern bool pause = false;
 
@@ -77,11 +80,31 @@ int main()
 	ImGui_ImplGlfw_InitForOpenGL(window, false);
 	ImGui_ImplOpenGL3_Init("#version 330");
 
+	const int cores = std::thread::hardware_concurrency();
+
+	std::vector<std::thread> threads;
+	threads.reserve(cores);
+
+	const auto calcLambda = [&tree](int i, int max, int num)
+	{
+		tree.Calculate(i, max, num);
+	};
+
+	int bitFlag = 1;
+
+	for (int i = 0; i < cores; i++)
+	{
+		threads.emplace_back(calcLambda,
+			static_cast<int>(tree.getBodiesAmount() * (static_cast<float>(i) / cores)),
+			static_cast<int>(tree.getBodiesAmount() * (static_cast<float>(i + 1) / cores)),
+			bitFlag);
+		bitFlag *= 2;
+	}
+
 	while (!glfwWindowShouldClose(window))
 	{
 		if (!pause)
 		{
-			tree.Calculate();
 			tree.Update();
 			
 			camera.input(window);
@@ -100,8 +123,17 @@ int main()
 			glfwSwapBuffers(window);
 			
 		}
-		pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
+		//pause = !glfwGetWindowAttrib(window, GLFW_FOCUSED);
 		glfwPollEvents();
+		if (glfwWindowShouldClose(window))
+		{
+			tree.isWorking = false;
+		}
+	}
+
+	for (std::thread& thread : threads)
+	{
+		thread.join();
 	}
 
 	ImGui::DestroyContext();
