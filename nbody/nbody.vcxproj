@@ -96,9 +96,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Node.cpp" />
-    <ClCompile Include="NodeT.cpp" />
     <ClCompile Include="Octree.cpp" />
-    <ClCompile Include="OctreeT.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>

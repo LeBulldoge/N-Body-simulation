@@ -5,7 +5,7 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
 
-#include "Octree.h"
+#include "OctreeT.h"
 #include "Shader.h"
 #include "Constants.h"
 #include "Body.h"

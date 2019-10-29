@@ -7,5 +7,5 @@ const double AU = 1.49597893e11;
 const int WIDTH = 1280;
 const int HEIGHT = 720;
 
-const int AMOUNT = 10000;
+const int AMOUNT = 5;
 const float PI = 3.14159265358979323846f;
