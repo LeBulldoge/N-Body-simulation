@@ -10,8 +10,7 @@
 #include "Graphics.h"
 #include "Camera.h"
 #include "WindowManager.h"
-//#include "Octree.h"
-#include "OctreeT.h"
+#include "Octree.h"
 
 
 extern bool pause = false;
@@ -34,12 +33,9 @@ int main()
 
 	glm::mat4 MVP = projection * camera.getView() * model;
 
-	//Octree tree(AMOUNT);
+	Octree tree(AMOUNT);
 
-	OctreeT tTree(AMOUNT);
-
-	initGFXBodies(MVP, tTree.getBodiesAmount());
-	//initGFXBoxes(MVP, tree.getBoxAmount());
+	initGFXBodies(MVP, tree.getBodiesAmount());
 
 	WindowManager wm(2);
 	wm.addWindow(400, 100, "Framerate", ImGuiCond_FirstUseEver, true, true, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground);
@@ -65,10 +61,10 @@ int main()
 
 	bool showBoxes = false;
 	//???
-	wm[1].value()->addDrawables([&tTree, &showBoxes]()
+	wm[1].value()->addDrawables([&tree, &showBoxes]()
 	{
-		ImGui::SliderFloat("THETA", &tTree.getTheta(), 0.f, 2.f, "%.5f");
-		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0.0 will cause instability.", tTree.getBodiesAmount());
+		ImGui::SliderFloat("THETA", &tree.getTheta(), 0.f, 2.f, "%.5f");
+		ImGui::TextWrapped("Controls the performance/accuracy ratio.\nWARNING: Depending on the amount bodies (%i), setting Theta close to 0.0 will cause instability.", tree.getBodiesAmount());
 		ImGui::Checkbox("Draw octree", &showBoxes);
 	});
 
@@ -81,9 +77,9 @@ int main()
 	std::vector<std::thread> threads;
 	threads.reserve(cores);
 
-	const auto calcLambda = [&tTree](int i, int max, int num)
+	const auto calcLambda = [&tree](int i, int max, int num)
 	{
-		tTree.processBodies(i, max, num);
+		tree.processBodies(i, max, num);
 	};
 
 	int bitFlag = 1;
@@ -91,8 +87,8 @@ int main()
 	for (int i = 0; i < cores; i++)
 	{
 		threads.emplace_back(calcLambda,
-			static_cast<int>(tTree.getBodiesAmount() * (static_cast<float>(i) / cores)),
-			static_cast<int>(tTree.getBodiesAmount() * (static_cast<float>(i + 1) / cores)),
+			static_cast<int>(tree.getBodiesAmount() * (static_cast<float>(i) / cores)),
+			static_cast<int>(tree.getBodiesAmount() * (static_cast<float>(i + 1) / cores)),
 			bitFlag);
 		bitFlag *= 2;
 	}
@@ -100,9 +96,7 @@ int main()
 	while (!glfwWindowShouldClose(window))
 	{
 		if (!pause)
-		{
-			//tree.Update();
-			
+		{			
 			camera.input(window);
 			camera.update();
 
@@ -110,7 +104,7 @@ int main()
 			projection = glm::perspective(glm::radians(45.f), (float)fbW / fbH, 0.1f, 100.f);
 			MVP = projection * camera.getView() * model;
 
-			drawBodies(tTree.getBodiesData(), MVP, tTree.getBodiesAmount());
+			drawBodies(tree.getBodiesData(), MVP, tree.getBodiesAmount());
 			if (showBoxes)
 			{
 				//drawBox(tree.getBoxesData(), MVP, tree.getBoxAmount());
@@ -123,7 +117,7 @@ int main()
 		glfwPollEvents();
 		if (glfwWindowShouldClose(window))
 		{
-			//tTree.isWorking = false;
+			tree.setActive(false);
 		}
 	}
 
